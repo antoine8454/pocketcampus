@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/sdk_list_preferences_layout"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:focusable="true">
+
+    <TextView
+        android:id="@+id/sdk_list_preferences_entry_text"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@+id/sdk_list_preferences_entry_prefBox"
+        android:layout_width="wrap_content"
+        android:paddingLeft="6dip"
+        style="@style/PocketCampusTheme.Primary.Subtitle"/>
+    <CheckBox
+        android:id="@+id/sdk_list_preferences_entry_prefBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="6dip"
+        android:layout_alignParentRight="true" />
+
+</RelativeLayout>

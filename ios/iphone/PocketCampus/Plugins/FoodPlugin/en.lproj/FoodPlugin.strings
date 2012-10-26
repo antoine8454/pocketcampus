@@ -1,0 +1,24 @@
+/* 
+  Localizable.strings
+  PocketCampus
+
+  Created by Loïc Gardiol on 01.03.12.
+  Copyright (c) 2012 EPFL. All rights reserved.
+*/
+
+"PluginName" = "Restaurants";
+"MenusTableViewSectionName" = "Menus";
+"CenterLabelLoadingText" = "Loading menus";
+"NoMealsToday" = "No menu today.";
+"NoMealsWeekend" = "No menu during the weekend.";
+"Map" = "Map";
+"NoVote" = "No vote";
+"VoteNameSingular" = "vote";
+"VoteNamePlural" = "votes";
+"VoteVerb" = "vote";
+"RatingSendingError" = "Sorry, an error occured. Please try again.";
+"RatingTooEarly" = "Sorry, it's too early to vote.";
+"RatingAlreadyDone" = "You can vote only once a day";
+
+
+/* Accessiblity */

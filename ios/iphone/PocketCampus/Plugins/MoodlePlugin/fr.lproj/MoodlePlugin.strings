@@ -1,0 +1,18 @@
+
+"PluginName" = "Moodle";
+"MoodleDown" = "Désolé, les serveurs de Moodle sont inaccessibles. Réessayez plus tard.";
+"MoodleNoCourse" = "Vous ne semblez être inscrit\nà aucun cours Moodle.";
+"MoodleEmptyCourse" = "Cours vide";
+"MoodleCourses" = "Cours";
+"MoodleWeek" = "Semaine";
+"MoodleAllWeeks" = "Toutes les semaines";
+"MoodleCurrentWeek" = "Semaine courante";
+"Saved" = "téléchargé ";
+"LoadingCourse" = "Chargement du cours\nVeuillez patienter";
+"ErrorWhileDownloadingFile" = "Une erreur est survenue pendant le téléchargement du fichier.\n\n Vérifier votre connexion internet.";
+"FileCouldNotBeDisplayedTryOpenIn" = "Ce fichier ne peut pas être affiché.\nEssayez le bouton action.";
+"Sorry" = "Désolé";
+"NoActionForThisFile" = "Aucune action n'est disponible pour ce fichier.";
+"DownloadingFile" = "Téléchargement du fichier...";
+"DeleteFileFromCacheQuestion" = "Supprimer le fichier du stockage local ?\nVous devrez le télécharger à nouveau pour pouvoir le lire.";
+"ImpossibleDeleteFile" = "Désolé, une erreur s'est produite lors de la suppression du fichier.";

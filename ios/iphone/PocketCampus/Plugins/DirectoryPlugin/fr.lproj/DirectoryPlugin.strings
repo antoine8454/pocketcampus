@@ -1,0 +1,18 @@
+/* 
+  Localizable.strings
+  PocketCampus
+
+  Created by Loïc Gardiol on 01.03.12.
+  Copyright (c) 2012 EPFL. All rights reserved.
+*/
+
+"PluginName" = "Annuaire";
+"SearchFieldPlaceholder" = "Rechercher dans l'annuaire de l'EPFL";
+"SearchNoResult" = "Aucun résultat\nEssayez avec l'orthographe exacte (accents)";
+"OfficeLabel" = "bureau";
+"(showOnMap)" = "(voir sur le plan)";
+
+/* Accessiblity */
+
+"SearchBar" = "Barre de recherche";
+"SearchResults" = "Résultats de la recherche";

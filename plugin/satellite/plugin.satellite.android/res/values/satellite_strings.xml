@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- General -->
+    <string name="satellite_plugin_name">Satellite</string>
+    <string name="satellite_nothing_to_display">Could not connect.</string>
+    <string name="satellite_no_beer_to_display">No beer of the month for now!</string>
+    <string name="satellite_menu_main_page">Satellite</string>
+    <string name="satellite_loading">Loading...</string>
+
+    <!-- Affluence -->
+    <string name="satellite_affluence">Affluence</string>
+    <string name="satellite_menu_affluence">Affluence</string>
+    <string name="satellite_affluence_empty">So few people!</string>
+    <string name="satellite_affluence_medium">It\'s getting crowded...</string>
+    <string name="satellite_affluence_crowded">Almost there...</string>
+    <string name="satellite_affluence_full">There it is, we\'re full!</string>
+    <string name="satellite_affluence_closed">Don\'t bother, we\'re closed...</string>
+    <string name="satellite_affluence_error">Error</string>
+
+    <!-- Beer(s) -->
+    <string name="satellite_menu_beers">Beers</string>
+    <string name="satellite_beer_of_month">Beer Of The Month</string>
+
+    <!-- Events -->
+    <string name="satellite_menu_events">Events</string>
+
+    <!-- Sandwiches -->
+    <string name="satellite_menu_sandwiches">Sandwiches</string>
+
+    <!-- Error -->
+    <string name="satellite_network_error">Could not connect.</string>
+
+</resources>

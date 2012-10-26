@@ -1,16 +1,21 @@
-# built application files
-*.apk
-*.ap_
 
-# files for the dex VM
-*.dex
+/.metadata
 
-# Java class files
-*.class
+/html5/offline/log.log
 
-# generated files
+/ios/iphone/PocketCampus/AutomationScripts/Instruments Device.trace
+/ios/iphone/PocketCampus/AutomationScripts/Instruments Simulator.trace
+/ios/iphone/PocketCampus/AutomationScripts/*.trace
+/ios/iphone/PocketCampus/AutomationScripts/Credentials.js
+
+
+
+android/PocketCampus/*
+server/PocketCampusServer/*
+local.properties
+*~
 bin/
 gen/
+target/
 
-# Local configuration file (sdk path, etc)
-local.properties
+

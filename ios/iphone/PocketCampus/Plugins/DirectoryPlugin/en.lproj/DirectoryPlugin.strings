@@ -1,0 +1,20 @@
+/* 
+  Localizable.strings
+  PocketCampus
+
+  Created by Loïc Gardiol on 01.03.12.
+  Copyright (c) 2012 EPFL. All rights reserved.
+*/
+
+"PluginName" = "Directory";
+"SearchFieldPlaceholder" = "Search EPFL directory";
+"SearchNoResult" = "No result\nHave you tried with the exact spelling (accents) ?";
+"OfficeLabel" = "office";
+"(showOnMap)" = "(show on map)";
+
+
+
+/* Accessiblity */
+
+"SearchBar" = "Search bar";
+"SearchResults" = "Search results";

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- General -->
+    <string name="transport_plugin_name">Transport</string>
+    <string name="transport_no_stations_message">Go add a station!</string>
+    <string name="transport_set_stations_message">Search station</string>
+    <string name="transport_edit_stations">Edit your stations</string>
+    <string name="transport_add_station">Add a station</string>
+    <string name="transport_remove_stations">Remove stations</string>
+    <string name="transport_new_station">New station</string>
+    <string name="transport_confirmation">Confirmation</string>
+    <string name="transport_confirmation_delete_station_start">Are you sure you want to remove</string>
+    <string name="transport_confirmation_delete_station_end">from your favorite stations?</string>
+    <string name="transport_yes">Yes</string>
+    <string name="transport_no">No</string>
+
+    <!-- Timing -->
+    <string name="transport_departure_now">Right now!</string>
+    <string name="transport_departure_at">Departure at</string>
+    <string name="transport_departure_in">Departure in</string>
+    <string name="transport_in">In</string>
+    <string name="transport_arrival_at">Arrival at</string>
+    <string name="transport_arrival_in">Arrival in</string>
+    <string name="transport_hour">hour</string>
+    <string name="transport_hours">hours</string>
+    <string name="transport_minute">minute</string>
+    <string name="transport_minutes">minutes</string>
+    <string name="transport_minute_abbrev">min.</string>
+
+    <!-- Menu -->
+    <string name="transport_menu_stations">Edit stations</string>
+    <string name="transport_menu_settings">Settings</string>
+
+    <!-- Error -->
+    <string name="transport_network_error">Could not connect.</string>
+
+    <!-- From last year -->
+    <string name="transport_to">to</string>
+    <string name="transport_walk_in_min">min. walk</string>
+    <string name="transport_by_feet">Walking</string>
+
+</resources>

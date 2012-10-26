@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="news_plugin_title">News</string>
+
+	<string name="news_preferences_rss_title">RSS Options</string>
+	<string name="news_preferences_other_title">Options</string>
+
+	<string name="news_settings">Preferences</string>
+	<string name="news_no_news">Could not connect.</string>
+	<string name="news_loading">Loading news...</string>
+
+	<string name="news_no_feed_selected">No feed selected.</string>
+	<string name="news_readmore">
+		<u>Read more...</u>
+	</string>
+
+	<!-- Preferences -->
+	<string name="news_preferences">Preferences</string>
+
+
+</resources>

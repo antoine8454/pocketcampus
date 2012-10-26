@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="pushnotif_plugin_title">PushNotif</string>
+    
+    <string name="pushnotif_courses_view_title">List of enrolled PushNotif Courses</string>
+    <string name="pushnotif_events_view_title">Current PushNotif Events</string>
+        
+    <string name="pushnotif_string_logout">Logout</string>
+    <string name="pushnotif_string_events">Events</string>
+        
+    <string name="pushnotif_error_pushnotif_down">PocketCampus tried to connect to PushNotif servers, but they seem down.</string>
+    <string name="pushnotif_connection_error_happened">We cannot fetch PushNotif data right now, because you are not connected to the Internet.</string>
+    <string name="pushnotif_file_downloaded">File successfully downloaded.</string>
+    <string name="pushnotif_file_downloading">Downloading file... Please wait.</string>
+
+    <string name="pushnotif_no_app_to_handle_filetype">Could not find any application to open this file.</string>
+        
+    
+    <string name="pushnotif_permission_description">This permission should be used when a third-party application wants to use the push notification service provided by PocketCampus</string>
+    <string name="pushnotif_permission_label">use the PocketCampus push notification service</string>
+    <string name="pushnotif_permission_group_description">This permission group is used to group PocketCampus permissions related to the push notification service</string>
+    <string name="pushnotif_permission_group_label">Push Notifications</string>
+    
+    
+</resources>

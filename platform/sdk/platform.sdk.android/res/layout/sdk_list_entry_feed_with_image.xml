@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/sdk_list_entry_feed_news_item_texts"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal" >
+
+    <LinearLayout
+        android:id="@+id/sdk_list_entry_feed_with_image_image"
+        android:layout_width="90dip"
+        android:layout_height="50dip"
+        android:layout_centerVertical="true"
+        android:layout_gravity="center_vertical|center_horizontal" >
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/sdk_list_entry_feed_with_image_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_toLeftOf="@+id/sdk_list_entry_feed_with_image_arrow"
+        android:layout_toRightOf="@+id/sdk_list_entry_feed_with_image_image"
+        android:layout_weight="1"
+        android:maxLines="3"
+        android:textColor="@color/black"
+        android:textSize="15sp" >
+    </TextView>
+
+    <ImageView
+        android:id="@+id/sdk_list_entry_feed_with_image_arrow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_gravity="right"
+        android:paddingRight="5dip"
+        android:src="@drawable/sdk_arrow_mini_icon"
+        android:visibility="visible" >
+    </ImageView>
+
+</RelativeLayout>
