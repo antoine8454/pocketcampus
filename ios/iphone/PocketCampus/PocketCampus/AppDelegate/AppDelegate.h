@@ -12,11 +12,19 @@
 
 #import "GANTracker.h"
 
-@interface AppDelegate : UIResponder <UIApplicationDelegate, GANTrackerDelegate> {
-    MainController* mainController;
-}
+/* __unsued put to remove warnings, Xcode is just stupid and does not see that they are used */
+
+static NSString* AppDidSucceedToRegisterToNotifications __unused = @"AppDidSucceedToRegisterToNotifications";
+static NSString* kPushDeviceTokenStringKey __unused = @"PushDeviceTokenString";
+static NSString* AppDidFailToRegisterToNotifications __unused = @"AppDidFailToRegisterToNotifications";
+
+static NSString* RemoteNotifForPluginName __unused = @"AppDidReceiveRemoteNotificationForPlugin";
+
+@interface AppDelegate : UIResponder <UIApplicationDelegate, GANTrackerDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
-@property (retain) MainController* mainController;
+@property (retain) MainController* MainController;
+
++ (NSString*)nsNotificationNameForPluginLowerIdentifier:(NSString*)pluginLowerIdentifier;
 
 @end

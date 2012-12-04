@@ -14,14 +14,19 @@
 
 #import "GANTracker.h"
 
+#import "MyEduServiceTests.h"
+
+#import "PushNotifControllerTests.h"
+
+static id test __strong = nil;
+
 @implementation AppDelegate
 
-@synthesize window = _window, mainController;
+@synthesize window = _window;
 
 - (void)dealloc
 {
     [[GANTracker sharedTracker] stopTracker];
-    [mainController release];
     [_window release];
     [super dealloc];
 }
@@ -49,9 +54,36 @@
     if ([PCUtils isOSVersionSmallerThan:6.0]) {
         [application setStatusBarStyle:UIStatusBarStyleDefault animated:YES];
     }
-    self.mainController = [[[MainController alloc] initWithWindow:self.window] autorelease];
+    
+    self.MainController = [[[MainController alloc] initWithWindow:self.window] autorelease];
+    
+    
+    /* OFFICIAL TESTS */
+    
+    //test = [[PushNotifControllerTests alloc] init];
+    //[test testRegistrationAuthenticated];
+
+    
+    //[[[PocketCampusLogicTests alloc] init] testAll];
+    
+    //[[[DirectoryServiceTests alloc] init] tempTest];
+    
+    //[[[MapServiceTests alloc] init] tempTest];
+    
+    //[[[MyEduServiceTests alloc] init] tempTest];
+    
+    /* END OF OFFICAL TESTS */
     
     [self.window makeKeyAndVisible];
+    
+    /* App might have been opened by notification touch */
+    NSDictionary* userInfo = [launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey];
+    if (userInfo) {
+        [self application:[UIApplication sharedApplication] didReceiveRemoteNotification:userInfo];
+    }
+    
+    //test
+    //[self application:[UIApplication sharedApplication] didReceiveRemoteNotification:[NSDictionary dictionaryWithObject:@"myedu" forKey:@"pluginName"]];
 
     return YES;
 }
@@ -77,13 +109,38 @@
 - (void)applicationDidBecomeActive:(UIApplication *)application
 {
     // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
-    [self.mainController refreshDisplayedPlugin];
+    [self.MainController refreshDisplayedPlugin];
     
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application
 {
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
+}
+
+- (NSUInteger)application:(UIApplication *)application supportedInterfaceOrientationsForWindow:(UIWindow *)window {
+    return [window.rootViewController supportedInterfaceOrientations];
+}
+
+- (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
+    NSString* deviceTokenString = [[[deviceToken description] stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"<>"]] stringByReplacingOccurrencesOfString:@" " withString:@""];
+    NSNotification* notif = [NSNotification notificationWithName:AppDidSucceedToRegisterToNotifications object:nil userInfo:[NSDictionary dictionaryWithObject:deviceTokenString forKey:kPushDeviceTokenStringKey]];
+    [[NSNotificationCenter defaultCenter] postNotification:notif];
+}
+
+- (void)application:(UIApplication *)application didFailToRegisterForRemoteNotificationsWithError:(NSError *)error {
+    [[NSNotificationCenter defaultCenter] postNotificationName:AppDidFailToRegisterToNotifications object:nil];
+}
+
+- (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo {
+    NSString* pluginName = userInfo[@"pluginName"];
+    NSString* message = userInfo[@"aps"][@"alert"];
+    NSLog(@"-> Notification received for plugin %@: %@", pluginName, message);
+    [[NSNotificationCenter defaultCenter] postNotificationName:[self.class nsNotificationNameForPluginLowerIdentifier:pluginName] object:nil userInfo:userInfo];
+}
+
++ (NSString*)nsNotificationNameForPluginLowerIdentifier:(NSString*)pluginLowerIdentifier {
+    return [NSString stringWithFormat:@"%@_%@", RemoteNotifForPluginName, pluginLowerIdentifier];
 }
 
 /* Google Analytics Delegation */

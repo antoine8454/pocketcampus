@@ -16,6 +16,8 @@
 
 #import "PCValues.h"
 
+#import "PCUtils.h"
+
 @implementation GasparViewController
 
 @synthesize tableView, delegate, token, showSavePasswordSwitch, hideGasparUsageAccountMessage, presentationMode, viewControllerForPresentation;
@@ -25,6 +27,7 @@
     self = [super initWithNibName:@"GasparView" bundle:nil];
     if (self) {
         presentationMode = PresentationModeNavStack; //default
+        self.modalPresentationStyle = UIModalPresentationFormSheet; //prevents full-screen on iPad
         showSavePasswordSwitch = NO; //default
         hideGasparUsageAccountMessage = NO; //default
         viewControllerForPresentation = nil;
@@ -57,7 +60,7 @@
     [backgroundView release];
     if (presentationMode == PresentationModeModal || presentationMode == PresentationModeTryHidden) {
         UIBarButtonItem* cancelButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelPressed)];
-        self.navigationItem.rightBarButtonItem = cancelButton;
+        self.navigationItem.leftBarButtonItem = cancelButton;
         [cancelButton release];
     } else if (presentationMode == PresentationModeNavStack && isLoggedIn) {
         [self showDoneButton];
@@ -74,12 +77,21 @@
 
 - (NSUInteger)supportedInterfaceOrientations //iOS 6
 {
-    return UIInterfaceOrientationMaskPortrait;
+    if ([PCUtils isIdiomPad]) {
+        return UIInterfaceOrientationMaskAll;
+    } else {
+        return UIInterfaceOrientationMaskPortrait;
+    }
+    
 }
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation //iOS 5
 {
-    return (interfaceOrientation == UIInterfaceOrientationPortrait);
+    if ([PCUtils isIdiomPad]) {
+        return YES;
+    } else {
+        return (interfaceOrientation == UIInterfaceOrientationPortrait);
+    }
 }
 
 - (void)showDoneButton {
@@ -90,14 +102,16 @@
 
 - (void)cancelPressed {
     [authenticationService cancelOperationsForDelegate:self];
-    [AuthenticationService enqueueLogoutNotificationDelayed:NO];
     [AuthenticationService deleteSavedPasswordForUsername:[AuthenticationService savedUsername]];
     if (presentationMode == PresentationModeModal) {
         [self.presentingViewController dismissViewControllerAnimated:YES completion:^{
             if ([(NSObject*)self.delegate respondsToSelector:@selector(userCancelledAuthentication)]) {
                 [(NSObject*)self.delegate performSelectorOnMainThread:@selector(userCancelledAuthentication) withObject:nil waitUntilDone:YES];
+                [AuthenticationService enqueueLogoutNotificationDelayed:NO];
             }
         }];
+    } else {
+        [AuthenticationService enqueueLogoutNotificationDelayed:NO];
     }
 }
 
@@ -380,11 +394,12 @@
             loginCell = [cell retain];
             loginCell.textLabel.text = NSLocalizedStringFromTable(@"Login", @"AuthenticationPlugin", nil);
             loginCell.textLabel.textAlignment = UITextAlignmentCenter;
+            loginCell.textLabel.textColor = [UIColor colorWithRed:81.0/255.0 green:102.0/255.0 blue:145.0/255.0 alpha:1.0];
             loginCell.selectionStyle = UITableViewCellSelectionStyleNone;
             loginCell.textLabel.enabled = NO;
             loadingIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
             [loginCell.contentView addSubview:loadingIndicator];
-            loadingIndicator.center = CGPointMake(275.0, 22.0);
+            loadingIndicator.center = CGPointMake(30.0, 22.0);
             [loadingIndicator release];
             [self inputFieldsDidChange];
             return cell;

@@ -12,7 +12,12 @@
 
 + (BOOL)isRetinaDevice;
 + (BOOL)is4inchDevice;
++ (BOOL)isIdiomPad;
 + (BOOL)isOSVersionSmallerThan:(CGFloat)version;
++ (NSString*)userLanguageCode;
++ (NSString*)lastUpdateNowString;
 + (void)reloadTableView:(UITableView*)tableView withFadingDuration:(NSTimeInterval)duration;
++ (void)printFrame:(CGRect)frame;
++ (NSString*)stringFromFileSize:(unsigned long long)size;
 
 @end

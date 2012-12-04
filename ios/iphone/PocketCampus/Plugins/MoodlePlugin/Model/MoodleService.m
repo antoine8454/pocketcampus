@@ -3,42 +3,80 @@
 
 #import "ObjectArchiver.h"
 
+#import "PCUtils.h"
+
+@interface MoodleService ()
+
+@property (nonatomic, strong) MoodleSession* session;
+
+@end
+
 @implementation MoodleService
 
-static MoodleService* instance = nil;
+static MoodleService* instance __weak = nil;
 
 static int kFetchMoodleResourceTimeoutSeconds = 20;
 
-static NSString* kMoodleCookieKey = @"moodleCookie";
+static NSString* kMoodleSessionKey = @"moodleSession";
 
-@synthesize moodleCookie;
+- (id)init {
+    @synchronized(self) {
+        if (instance) {
+            @throw [NSException exceptionWithName:@"Double instantiation attempt" reason:@"MoodleService cannot be instancied more than once at a time, use sharedInstance instead" userInfo:nil];
+        }
+        self = [super initWithServiceName:@"moodle"];
+        if (self) {
+            instance = self;
+        }
+        return self;
+    }
+}
 
 + (id)sharedInstanceToRetain {
-    if (instance != nil) {
-        return instance;
-    }
-    @synchronized(self) {
-        if (instance == nil) {
-            instance = [[[self class] alloc] initWithServiceName:@"moodle"];            
-            instance.moodleCookie = (NSString*)[ObjectArchiver objectForKey:kMoodleCookieKey andPluginName:@"moodle"];
+    @synchronized (self) {
+        if (instance) {
+            return instance;
         }
+#if __has_feature(objc_arc)
+        return [[[self class] alloc] init];
+#else
+        return [[[[self class] alloc] init] autorelease];
+#endif
     }
-    return [instance autorelease];
 }
 
 - (id)thriftServiceClientInstance {
-    return [[[MoodleServiceClient alloc] initWithProtocol:[self thriftProtocolInstance]] autorelease];
+    return [[MoodleServiceClient alloc] initWithProtocol:[self thriftProtocolInstance]];
 }
 
-+ (BOOL)deleteMoodleCookie {
-    return [ObjectArchiver saveObject:nil forKey:kMoodleCookieKey andPluginName:@"moodle"];
+#pragma mark - Session
+
+- (MoodleRequest*)createMoodleRequestWithCourseId:(int)courseId {
+    SessionId* sessionId = [[SessionId alloc] initWithTos:TypeOfService_SERVICE_MOODLE pocketCampusSessionId:nil moodleCookie:[self lastSession].moodleCookie camiproCookie:nil isaCookie:nil];
+    MoodleRequest* request = [[MoodleRequest alloc] initWithISessionId:sessionId iLanguage:[PCUtils userLanguageCode] iCourseId:courseId];
+    return request;
 }
 
-- (BOOL)saveMoodleCookie:(NSString*)moodleCookie_ {
-    self.moodleCookie = moodleCookie_; //previous cookie is released by synthesized setter
-    return [ObjectArchiver saveObject:moodleCookie_ forKey:kMoodleCookieKey andPluginName:@"moodle"];
+- (MoodleSession*)lastSession {
+    if (self.session) {
+        return self.session;
+    }
+    self.session = (MoodleSession*)[ObjectArchiver objectForKey:kMoodleSessionKey andPluginName:@"moodle"];
+    return self.session;
 }
 
+- (BOOL)saveSession:(MoodleSession*)session {
+    self.session = session;
+    return [ObjectArchiver saveObject:session forKey:kMoodleSessionKey andPluginName:@"moodle"];
+}
+
+- (BOOL)deleteSession {
+    self.session = nil;
+    return [ObjectArchiver saveObject:nil forKey:kMoodleSessionKey andPluginName:@"moodle"];
+}
+
+#pragma mark -
+                              
 + (NSString*)fileTypeForURL:(NSString*)urlString {
     NSString* ext = [urlString pathExtension];
     if (ext) {
@@ -97,7 +135,6 @@ static NSString* kMoodleCookieKey = @"moodleCookie";
     operation.delegateDidFailSelector = @selector(getTequilaTokenForMoodleFailed);
     operation.returnType = ReturnTypeObject;
     [operationQueue addOperation:operation];
-    [operation release];
 }
 
 - (void)getSessionIdForServiceWithTequilaKey:(TequilaToken*)tequilaKey delegate:(id)delegate {
@@ -108,25 +145,29 @@ static NSString* kMoodleCookieKey = @"moodleCookie";
     [operation addObjectArgument:tequilaKey];
     operation.returnType = ReturnTypeObject;
     [operationQueue addOperation:operation];
-    [operation release];
 }
 
-- (ServiceRequest*)serviceRequestGetCoursesList:(MoodleRequest*)aMoodleRequest delegate:(id)delegate {
+- (void)getCoursesList:(MoodleRequest*)aMoodleRequest withDelegate:(id)delegate {
     ServiceRequest* operation = [[ServiceRequest alloc] initWithThriftServiceClient:[self thriftServiceClientInstance] service:self delegate:delegate];
     operation.serviceClientSelector = @selector(getCoursesList:);
     operation.delegateDidReturnSelector = @selector(getCoursesList:didReturn:);
     operation.delegateDidFailSelector = @selector(getCoursesListFailed:);
-    operation.returnType = ReturnTypeObject;
+    operation.cacheValidity = 1209600; // seconds == 2 weeks
+    operation.keepInCache = YES;
+    operation.skipCache = YES;
     [operation addObjectArgument:aMoodleRequest];
-    return [operation autorelease];
+    operation.returnType = ReturnTypeObject;
+    [operationQueue addOperation:operation];
 }
 
-//default parameters
-- (void)getCoursesList:(MoodleRequest*)aMoodleRequest withDelegate:(id)delegate {
-    ServiceRequest* operation = [self serviceRequestGetCoursesList:aMoodleRequest delegate:delegate];
-    operation.keepInCache = YES;
-    operation.cacheValidity = 30.0; // 30 seconds
-    [operationQueue addOperation:operation];
+- (CoursesListReply*)getFromCacheCoursesListForRequest:(MoodleRequest*)moodleRequest {
+    ServiceRequest* operation = [[ServiceRequest alloc] initForCachedResponseOnlyWithService:self];
+    operation.serviceClientSelector = @selector(getCoursesList:);
+    operation.delegateDidReturnSelector = @selector(getCoursesList:didReturn:);
+    operation.delegateDidFailSelector = @selector(getCoursesListFailed:);
+    [operation addObjectArgument:moodleRequest];
+    operation.returnType = ReturnTypeObject;
+    return [operation cachedResponseObjectEvenIfStale:YES];
 }
 
 - (void)getEventsList:(MoodleRequest*)aMoodleRequest withDelegate:(id)delegate {
@@ -137,13 +178,12 @@ static NSString* kMoodleCookieKey = @"moodleCookie";
     [operation addObjectArgument:aMoodleRequest];
     operation.returnType = ReturnTypeObject;
     [operationQueue addOperation:operation];
-    [operation release];
 }
 
 - (void)getCourseSections:(MoodleRequest*)aMoodleRequest withDelegate:(id)delegate {
     ServiceRequest* operation = [[ServiceRequest alloc] initWithThriftServiceClient:[self thriftServiceClientInstance] service:self delegate:delegate];
     operation.keepInCache = YES;
-    operation.returnCacheIfServerIsUnreachable = YES;
+    operation.skipCache = YES;
     operation.cacheValidity = 10*60.0; // 10 minutes
     operation.customTimeout = 60.0; // might take time
     operation.serviceClientSelector = @selector(getCourseSections:);
@@ -152,7 +192,16 @@ static NSString* kMoodleCookieKey = @"moodleCookie";
     [operation addObjectArgument:aMoodleRequest];
     operation.returnType = ReturnTypeObject;
     [operationQueue addOperation:operation];
-    [operation release];
+}
+
+- (SectionsListReply*)getFromCacheCourseSectionsForRequest:(MoodleRequest*)moodleRequest {
+    ServiceRequest* operation = [[ServiceRequest alloc] initForCachedResponseOnlyWithService:self];
+    operation.serviceClientSelector = @selector(getCourseSections:);
+    operation.delegateDidReturnSelector = @selector(getCourseSections:didReturn:);
+    operation.delegateDidFailSelector = @selector(getCourseSectionsFailed:);
+    [operation addObjectArgument:moodleRequest];
+    operation.returnType = ReturnTypeObject;
+    return [operation cachedResponseObjectEvenIfStale:YES];
 }
 
 - (void)fetchMoodleResourceWithURL:(NSString*)url cookie:(NSString*)cookie delegate:(id)delegate {    
@@ -167,14 +216,13 @@ static NSString* kMoodleCookieKey = @"moodleCookie";
     [request setDidFinishSelector:@selector(fetchMoodleResourceDidReturn:)];
     [request setDidFailSelector:@selector(fetchMoodleResourceFailed:)];
     [operationQueue addOperation:request];
-    [request release];
 }
 
 - (void)dealloc
 {
-    [moodleCookie release];
-    instance = nil;
-    [super dealloc];
+    @synchronized(self) {
+        instance = nil;
+    }
 }
 
 @end

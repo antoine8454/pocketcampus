@@ -12,10 +12,4 @@
 
 @synthesize mainViewController;
 
-- (void)dealloc
-{
-    [mainViewController release];
-    [super dealloc];
-}
-
 @end

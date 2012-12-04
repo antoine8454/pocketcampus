@@ -30,7 +30,7 @@ static CGFloat kBalanceCellHeight = 70.0;
 {
     self = [super initWithNibName:@"CamiproView" bundle:nil];
     if (self) {
-        authController = [[AuthenticationController alloc] init];
+        authController = [[AuthenticationController sharedInstance] retain];
         camiproService = [[CamiproService sharedInstanceToRetain] retain];
         balanceAndTransactions = nil;
         tequilaKey = nil;
@@ -147,6 +147,7 @@ static CGFloat kBalanceCellHeight = 70.0;
 - (void)getTequilaTokenForCamiproDidReturn:(TequilaToken*)tequilaKey_ {
     [tequilaKey release];
     tequilaKey = [tequilaKey_ retain];
+    NSLog(@"%@", tequilaKey_);
     [authController authToken:tequilaKey.iTequilaKey presentationViewController:self.navigationController delegate:self];
 }
 
