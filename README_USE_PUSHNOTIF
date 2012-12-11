@@ -88,3 +88,5 @@ To handle a notification within the app:
 	//[[MainController publicController] requestPluginToForeground:@"pluginNameInLowerCase"];
 	//refresh your data
 }];
+
+Finally, you need to push the file etc/pocketcampus-pushnotif-dev.p12 in /etc
