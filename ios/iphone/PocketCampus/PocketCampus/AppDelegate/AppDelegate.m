@@ -12,13 +12,15 @@
 
 #import "PCUtils.h"
 
+#import "PCValues.h"
+
 #import "GANTracker.h"
 
 #import "MyEduServiceTests.h"
 
 #import "PushNotifControllerTests.h"
 
-static id test __strong = nil;
+static id test __strong __unused = nil;
 
 @implementation AppDelegate
 
@@ -27,38 +29,38 @@ static id test __strong = nil;
 - (void)dealloc
 {
     [[GANTracker sharedTracker] stopTracker];
-    [_window release];
-    [super dealloc];
 }
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+    /* Apply appearence proxy => specified UI elements will defaut to PC defined look&feel, eg. red navigation bar */
+    [PCValues applyAppearenceProxy];
+    
     /* Initialize defaults with PC config */
     [PCConfig initConfig];
     
-    /* Start Google Analytics tracker if no config value prevents it */
-    if (![[PCConfig defaults] boolForKey:PC_OPTIONAL_GAN_DISABLED_KEY]) {
+    /* Start Google Analytics tracker if enabled in config */
+    if ([[PCConfig defaults] boolForKey:PC_CONFIG_GAN_ENABLED_KEY]) {
         NSLog(@"-> Starting Google Analytics tracker");
-        [[GANTracker sharedTracker] startTrackerWithAccountID:PC_PROD_GAN_ACCOUNT_ID
-                                               dispatchPeriod:PC_PROD_GAN_DISPATCH_PERIOD_SEC
-                                                     delegate:self];
+        NSString* ganId = (NSString*)[[PCConfig defaults] objectForKey:PC_CONFIG_GAN_TRACKING_CODE_KEY];
+        if (ganId) {
+            [[GANTracker sharedTracker] startTrackerWithAccountID:ganId dispatchPeriod:10 delegate:self];
+        } else {
+            NSLog(@"!! ERROR: could not start Google Analytics tracker because tracking code is absent from config.");
+        }
+        
     } else {
-        NSLog(@"-> Google Analytics tracker will NOT be started because GAN_disabled = YES in Config");
+        NSLog(@"-> Google Analytics disabled (config)");
     }
     
-    
-    self.window = [[[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]] autorelease];
+    self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     // Override point for customization after application launch.
     self.window.backgroundColor = [UIColor blackColor];
-
-    if ([PCUtils isOSVersionSmallerThan:6.0]) {
-        [application setStatusBarStyle:UIStatusBarStyleDefault animated:YES];
-    }
     
-    self.MainController = [[[MainController alloc] initWithWindow:self.window] autorelease];
+    self.mainController = [[MainController alloc] initWithWindow:self.window];
     
     
-    /* OFFICIAL TESTS */
+    /* TESTS */
     
     //test = [[PushNotifControllerTests alloc] init];
     //[test testRegistrationAuthenticated];
@@ -72,7 +74,7 @@ static id test __strong = nil;
     
     //[[[MyEduServiceTests alloc] init] tempTest];
     
-    /* END OF OFFICAL TESTS */
+    /* END OF TESTS */
     
     [self.window makeKeyAndVisible];
     
@@ -109,13 +111,16 @@ static id test __strong = nil;
 - (void)applicationDidBecomeActive:(UIApplication *)application
 {
     // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
-    [self.MainController refreshDisplayedPlugin];
     
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application
 {
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
+}
+
+- (void)applicationDidReceiveMemoryWarning:(UIApplication *)application {
+    [self.mainController appDidReceiveMemoryWarning];
 }
 
 - (NSUInteger)application:(UIApplication *)application supportedInterfaceOrientationsForWindow:(UIWindow *)window {

@@ -16,6 +16,8 @@
 
 #import "PCConfig.h"
 
+#import "PCUtils.h"
+
 static float SEPARATOR_HEIGHT = 1.0;
 static float RATINGS_HEIGHT = 28.0;
 static float MEAL_DESCRIPTION_FONT_SIZE = 16.0;
@@ -160,7 +162,7 @@ static float MEAL_DESCRIPTION_FONT_SIZE = 16.0;
     [[GANTracker sharedTracker] trackPageview:@"/v3r1/food/restaurant/click/rate" withError:NULL];
     [ratingActivityIndicator startAnimating];
     [self setVoteMode:VoteModeDisabled animated:YES];
-    if ([[PCConfig defaults] boolForKey:PC_OPTIONAL_CONFIG_ALLOW_MEALS_MULTI_VOTES_KEY]) {
+    if ([[PCConfig defaults] boolForKey:PC_CONFIG_ALLOW_MEALS_MULTI_VOTES_KEY]) {
         [service setRatingForMeal:meal.mealId rating:(double)ratingView.rating deviceId:[NSString stringWithFormat:@"%ld",time(NULL)]  delegate:self];
     } else {
         [service setRatingForMeal:meal.mealId rating:(double)ratingView.rating deviceId:[[UIDevice currentDevice] uniqueDeviceIdentifier]  delegate:self];
@@ -220,6 +222,7 @@ static float MEAL_DESCRIPTION_FONT_SIZE = 16.0;
         case VoteModeVote: 
         {
             [voteButton addTarget:self action:@selector(votePressed) forControlEvents:UIControlEventTouchUpInside];
+            [ratingView setEditable:NO resetRating:YES];
             b1_t animBlock = ^{
                 voteButton.frame = voteButtonNormalFrame;
                 NSString* voteActionText = NSLocalizedStringFromTable(@"VoteVerb", @"FoodPlugin", nil);
@@ -228,7 +231,7 @@ static float MEAL_DESCRIPTION_FONT_SIZE = 16.0;
                 voteButton.backgroundColor = [UIColor colorWithWhite:0.6 alpha:1.0];
             };
             if (animated) {
-                [UIView transitionWithView:voteButton duration:0.1 options:UIViewAnimationTransitionNone animations:animBlock completion:NULL];
+                [UIView animateWithDuration:0.1 animations:animBlock];
             } else {
                 animBlock();
             }
@@ -244,7 +247,7 @@ static float MEAL_DESCRIPTION_FONT_SIZE = 16.0;
                 voteButton.frame = voteButtonNormalFrame;
             };
             if (animated) {
-                [UIView transitionWithView:voteButton duration:0.1 options:UIViewAnimationTransitionNone animations:animBlock completion:NULL];
+                [UIView animateWithDuration:0.1 animations:animBlock];
             } else {
                 animBlock();
             }
@@ -256,7 +259,7 @@ static float MEAL_DESCRIPTION_FONT_SIZE = 16.0;
                 voteButton.frame = voteButtonHiddenFrame;
             };
             if (animated) {
-                [UIView transitionWithView:voteButton duration:0.1 options:UIViewAnimationTransitionFlipFromLeft animations:animBlock completion:NULL];
+                [UIView animateWithDuration:0.1 animations:animBlock];
             } else {
                 animBlock();
             }
@@ -288,8 +291,10 @@ static float MEAL_DESCRIPTION_FONT_SIZE = 16.0;
 }
 
 - (void)getRatingFor:(Meal*)meal_ didReturn:(Rating*)rating {
-    if (rating.numberOfVotes > 0) {
+    if (rating.numberOfVotes > 1) {
         votesLabel.text = [NSString stringWithFormat:@"  %d %@", rating.numberOfVotes, NSLocalizedStringFromTable(@"VoteNamePlural", @"FoodPlugin", nil)];
+    } else if (rating.numberOfVotes == 1) {
+        votesLabel.text = [NSString stringWithFormat:@"  %d %@", rating.numberOfVotes, NSLocalizedStringFromTable(@"VoteNameSingular", @"FoodPlugin", nil)];
     } else {
         votesLabel.text = [NSString stringWithFormat:@"  %@", NSLocalizedStringFromTable(@"NoVote", @"FoodPlugin", nil)];
     }
@@ -312,9 +317,7 @@ static float MEAL_DESCRIPTION_FONT_SIZE = 16.0;
 
 - (void)serviceConnectionToServerTimedOut {
     [ratingActivityIndicator stopAnimating];
-    UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"" message:NSLocalizedStringFromTable(@"ConnectionToServerTimedOut", @"PocketCampus", @"Message that says that connection to server is impossible and that internet connection must be checked.") delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
-    [alert show];
-    [alert release];
+    [PCUtils showConnectionToServerTimedOutAlert];
     [service cancelOperationsForDelegate:self];
     [controller setForAllCellsVoteMode:VoteModeVote exceptCell:nil animated:YES];
     [self updateRatingInfosRefreshFromServer:NO];

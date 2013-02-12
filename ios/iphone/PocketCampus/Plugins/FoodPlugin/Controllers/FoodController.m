@@ -32,7 +32,7 @@ static FoodController* instance __weak = nil;
     }
 }
 
-+ (id)sharedInstance {
++ (id)sharedInstanceToRetain {
     @synchronized (self) {
         if (instance) {
             return instance;
@@ -42,18 +42,6 @@ static FoodController* instance __weak = nil;
 #else
         return [[[[self class] alloc] init] autorelease];
 #endif
-    }
-}
-
-- (void)refresh {
-    if (mainViewController == nil || ![mainViewController isKindOfClass:[RestaurantsListViewController class]]) {
-        return;
-    }
-    if ([(RestaurantsListViewController*)(self.mainNavigationController.viewControllers[0]) shouldRefresh]) {
-        if (self.mainNavigationController.topViewController != self.mainNavigationController.viewControllers[0]) {
-            [self.mainNavigationController popToRootViewControllerAnimated:NO];
-        }
-        [(RestaurantsListViewController*)(self.mainNavigationController.viewControllers[0]) refresh];
     }
 }
 

@@ -8,9 +8,10 @@
 
 "HomeViewControllerTitle" = "PocketCampus EPFL";
 "ConnectionToServerTimedOut" = "Cannot connect to server.\nCheck your internet connection.";
+"ConnectionToServerTimedOutAlert" = "Cannot connect to server.\nCheck your internet connection.";
 "ConnectionToServerTimedOutShort" = "Cannot connect to server";
-"ConnectionToServerError" = "Sorry, an error occured. Try to reload.";
-"ConnectionToServerErrorShort" = "Sorry, an error occured"; 
+"ServerError" = "Sorry, an error occured. Try to reload.";
+"ServerErrorShort" = "Sorry, an error occured"; 
 "Cancel" = "Cancel";
 "Error" = "Error";
 "Loading..." = "Loading...";
@@ -22,3 +23,13 @@
 "Delete" = "Delete";
 "Settings" = "Settings";
 "LastUpdate" = "Last update";
+"LastUpdateNever" = "Last update: never";
+"Clear" = "Clear";
+"MainMenu" = "Main menu";
+"EditMainMenu" = "Edit main menu";
+"RestoreDefaultMainMenu" = "Default main menu";
+"Close" = "Close";
+"RatePCAppStore" = "Rate on App Store";
+"RatePCAppStoreSubtitle" = "Many thanks in advance :)";
+"LikePConFB" = "Facebook page";
+"LikePConFBSubtitle" = "Join the community !";

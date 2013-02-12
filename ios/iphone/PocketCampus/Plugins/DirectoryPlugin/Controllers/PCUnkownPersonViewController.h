@@ -9,15 +9,12 @@
 #import <AddressBook/AddressBook.h>
 #import <AddressBookUI/AddressBookUI.h>
 
-#import "directory.h"
+#import "DirectoryService.h"
 
-@interface PCUnkownPersonViewController : ABUnknownPersonViewController {
-    Person* person;
-}
+@interface PCUnkownPersonViewController : ABUnknownPersonViewController<DirectoryServiceDelegate>
 
-@property (nonatomic, retain) Person* person;
+@property (nonatomic, strong) Person* person;
 
 - (id)initWithDelegate:(id<ABUnknownPersonViewControllerDelegate>)delegate;
-- (void)setProfilePictureData:(NSData*)data;
 
 @end

@@ -91,12 +91,14 @@ static NSString* kMealCellIdentifier = @"mealCell";
 }
 
 - (void)showMapButtonIfPossible {
-    if (restaurantName == nil || [restaurantName isEqualToString:@"Bistro 31"] || [restaurantName isEqualToString:@"Hong Thaï Rung"] || [restaurantName isEqualToString:@"Maharaja"]) { //map plugin does not know these restaurants
-        return;
+    if (restaurantName == nil || [restaurantName isEqualToString:@"Bistro 31"] || [restaurantName isEqualToString:@"Hong Thaï Rung"] || [restaurantName isEqualToString:@"Maharaja"]
+        || [restaurantName isEqualToString:@"Obeirut Lebanese Cuisine"]) { //map plugin does not know these restaurants
+        [self.navigationItem setRightBarButtonItem:nil animated:YES];
+    } else {
+        UIBarButtonItem* mapButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedStringFromTable(@"Map", @"FoodPlugin", nil) style:UIBarButtonItemStyleBordered target:self action:@selector(mapButtonPressed)];
+        [self.navigationItem setRightBarButtonItem:mapButton animated:YES];
+        [mapButton release];
     }
-    UIBarButtonItem* mapButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedStringFromTable(@"Map", @"FoodPlugin", nil) style:UIBarButtonItemStyleBordered target:self action:@selector(mapButtonPressed)];
-    [self.navigationItem setRightBarButtonItem:mapButton animated:YES];
-    [mapButton release];
 }
 
 - (void)mapButtonPressed {
@@ -143,7 +145,9 @@ static NSString* kMealCellIdentifier = @"mealCell";
 
 - (void)tableView:(UITableView *)tableView didEndDisplayingCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
     [self setForAllCellsVoteMode:VoteModeVote exceptCell:nil animated:YES];
-    [self.navigationItem setRightBarButtonItem:nil animated:YES];
+    /*if (self.navigationItem) {
+        [self.navigationItem setRightBarButtonItem:nil animated:YES];
+    }*/
     [self showMapButtonIfPossible];
 }
 

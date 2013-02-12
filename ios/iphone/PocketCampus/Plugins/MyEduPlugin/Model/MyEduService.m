@@ -279,24 +279,25 @@ static MyEduService* instance __weak = nil;
     [operationQueue addOperation:operation];
 }
 
+#pragma mark - playback time persistence
 
-#pragma mark - Class utilities
-
-+ (NSString*)keyForMaterial:(MyEduMaterial*)material {
-    NSString* key = [NSString stringWithFormat:@"material-%u", [material.iURL hash]];
-    return key;
-}
-
-+ (NSTimeInterval)lastPlaybackTimeForVideoForModule:(MyEduModule*)module {
-    NSNumber* number = (NSNumber*)[ObjectArchiver objectForKey:[NSString stringWithFormat:@"lastPlayback-%@", [self keyForVideoOfModule:module]] andPluginName:@"myedu"];
+- (NSTimeInterval)lastPlaybackTimeForVideoForModule:(MyEduModule*)module {
+    NSNumber* number = (NSNumber*)[ObjectArchiver objectForKey:[NSString stringWithFormat:@"lastPlayback-%@", [self.class keyForVideoOfModule:module]] andPluginName:@"myedu"];
     if (!number) {
         return 0.0;
     }
     return (NSTimeInterval)[number doubleValue];
 }
 
-+ (BOOL)saveLastPlaybackTime:(NSTimeInterval)time forVideoOfModule:(MyEduModule*)module {
-    return [ObjectArchiver saveObject:[NSNumber numberWithDouble:time] forKey:[NSString stringWithFormat:@"lastPlayback-%@", [self keyForVideoOfModule:module]] andPluginName:@"myedu"];
+- (BOOL)saveLastPlaybackTime:(NSTimeInterval)time forVideoOfModule:(MyEduModule*)module {
+    return [ObjectArchiver saveObject:[NSNumber numberWithDouble:time] forKey:[NSString stringWithFormat:@"lastPlayback-%@", [self.class keyForVideoOfModule:module]] andPluginName:@"myedu"];
+}
+
+#pragma mark - Class utilities
+
++ (NSString*)keyForMaterial:(MyEduMaterial*)material {
+    NSString* key = [NSString stringWithFormat:@"material-%u", [material.iURL hash]];
+    return key;
 }
 
 + (NSString*)keyForVideoOfModule:(MyEduModule*)module {
@@ -310,7 +311,7 @@ static MyEduService* instance __weak = nil;
 
 + (NSString*)localPathOfVideoForModule:(MyEduModule*)module nilIfNoFile:(BOOL)nilIfNoFile { //if onlyIfFileExists is YES, nil is returned if file does not exist
     NSString* filename = [self keyForVideoOfModule:module];
-    NSString* fullPath = [ObjectArchiver pathForKey:filename pluginName:@"myedu" customFileExtension:@"mp4"];
+    NSString* fullPath = [ObjectArchiver pathForKey:filename pluginName:@"myedu" customFileExtension:@"mp4" isCache:YES];
     
     if (nilIfNoFile) {
         NSFileManager* fileManager = [NSFileManager defaultManager];
@@ -352,12 +353,13 @@ static MyEduService* instance __weak = nil;
     request.downloadProgressDelegate = progressView;
     request.showAccurateProgress = YES;
     request.shouldRedirect = NO;
-    [request addRequestHeader:@"Cookie" value:[self createMyEduRequest].iMyEduSession.iMyEduCookie];
+    request.timeOutSeconds = 5.0;
+    [request addRequestHeader:@"Cookie" value:[self lastSession].iMyEduCookie];
     [operationQueue addOperation:request];
 }
 
 - (MyEduMaterialData*)materialDataIfExistsForMaterial:(MyEduMaterial*)material {
-    return (MyEduMaterialData*)[ObjectArchiver objectForKey:[MyEduService keyForMaterial:material] andPluginName:@"myedu"];
+    return (MyEduMaterialData*)[ObjectArchiver objectForKey:[MyEduService keyForMaterial:material] andPluginName:@"myedu" isCache:YES];
 }
 
 
@@ -372,9 +374,9 @@ static MyEduService* instance __weak = nil;
             self.downloadsObserversForVideoKey = [NSMutableDictionary dictionary];
         }
         
-        NSMutableArray* currentObservers = self.downloadsObserversForVideoKey[key];
+        NSMutableSet* currentObservers = self.downloadsObserversForVideoKey[key];
         if (!currentObservers) { //start video download
-            currentObservers = [NSMutableArray array];
+            currentObservers = [NSMutableSet set];
             self.downloadsObserversForVideoKey[key] = currentObservers;
         }
         
@@ -420,10 +422,13 @@ static MyEduService* instance __weak = nil;
 
 - (void)removeDownloadObserver:(id)observer {
     @synchronized(self) {
-        [self.downloadsObserversForVideoKey enumerateKeysAndObjectsUsingBlock:^(id key, NSArray* observers, BOOL *stop) {
+        [[self.downloadsObserversForVideoKey copy] enumerateKeysAndObjectsUsingBlock:^(id key, NSMutableSet* observers, BOOL *stop) {
             for (MyEduDownloadObserver* downloadObserver in [observers copy]) {
                 if (downloadObserver.observer == observer) {
-                    [self.downloadsObserversForVideoKey[key] removeObject:downloadObserver];
+                    [observers removeObject:downloadObserver];
+                }
+                if (observers.count == 0) {
+                    [self.downloadsObserversForVideoKey removeObjectForKey:key];
                 }
             }
         }];
@@ -433,12 +438,15 @@ static MyEduService* instance __weak = nil;
 - (void)removeDownloadObserver:(id)observer forVideoModule:(MyEduModule*)module {
     @synchronized(self) {
         NSString* key = [MyEduService keyForVideoOfModule:module];
-        NSMutableArray* observers = self.downloadsObserversForVideoKey[key];
-        [[observers copy] enumerateObjectsUsingBlock:^(MyEduDownloadObserver* downloadObserver, NSUInteger idx, BOOL *stop) {
-            if (downloadObserver.observer == observer && [downloadObserver.downloadIdentifier isEqual:key]) {
+        NSMutableSet* observers = self.downloadsObserversForVideoKey[key];
+        for (MyEduDownloadObserver* downloadObserver in [observers copy]) {
+            if (downloadObserver.observer == observer && [downloadObserver.downloadIdentifier isEqualToString:key]) {
                 [observers removeObject:downloadObserver];
             }
-        }];
+            if (observers.count == 0) {
+                [self.downloadsObserversForVideoKey removeObjectForKey:key];
+            }
+        }
     }
 }
 
@@ -528,6 +536,8 @@ static MyEduService* instance __weak = nil;
 
 #pragma mark - ASIHTTRequestDelegate
 
+#pragma mark Material downloads callbacks
+
 - (void)downloadMaterialRequestFinished:(ASIHTTPRequest *)request {
     id<MyEduServiceDelegate> delegate = [request.userInfo objectForKey:kServiceDelegateKey];
     MyEduMaterial* material = [request.userInfo objectForKey:kMaterialKey];
@@ -539,7 +549,7 @@ static MyEduService* instance __weak = nil;
     
     MyEduMaterialData* materialData = [[MyEduMaterialData alloc] init];
     materialData.material = material;
-    materialData.localURL = [NSURL fileURLWithPath:[ObjectArchiver pathForKey:[MyEduService keyForMaterial:material] pluginName:@"myedu"]];
+    materialData.localURL = [NSURL fileURLWithPath:[ObjectArchiver pathForKey:[MyEduService keyForMaterial:material] pluginName:@"myedu" customFileExtension:nil isCache:YES]];
     materialData.data = request.responseData;
     NSString* contentType = [request.responseHeaders objectForKey:@"Content-Type"];
     NSArray* parts = [contentType componentsSeparatedByString:@";"];
@@ -551,23 +561,25 @@ static MyEduService* instance __weak = nil;
         [delegate downloadOfMaterial:material didFinish:materialData];
     }
     
-    [ObjectArchiver saveObject:materialData forKey:[MyEduService keyForMaterial:material] andPluginName:@"myedu"];
+    [ObjectArchiver saveObject:materialData forKey:[MyEduService keyForMaterial:material] andPluginName:@"myedu" isCache:YES];
 }
 
 - (void)downloadMaterialRequestFailed:(ASIHTTPRequest *)request {
     id<MyEduServiceDelegate> delegate = [request.userInfo objectForKey:kServiceDelegateKey];
-    if ([delegate respondsToSelector:@selector(downloadFailedForMaterial:)]) {
+    if ([delegate respondsToSelector:@selector(downloadFailedForMaterial:responseStatusCode:)]) {
         MyEduMaterial* material = [request.userInfo objectForKey:kMaterialKey];
         [delegate downloadFailedForMaterial:material responseStatusCode:request.responseStatusCode];
     }
 }
+
+#pragma mark Video downloads callbacks
 
 - (void)downloadVideoRequestFinished:(ASIHTTPRequest *)request {
     NSString* key = request.userInfo[kVideoKey];
     NSArray* observers = self.downloadsObserversForVideoKey[key];
     if (key) {
         [[observers copy] enumerateObjectsUsingBlock:^(MyEduDownloadObserver* downloadObserver, NSUInteger idx, BOOL *stop) {
-            if (downloadObserver.finishBlock) {
+            if (downloadObserver.observer && downloadObserver.finishBlock) {
                 downloadObserver.finishBlock([NSURL fileURLWithPath:request.downloadDestinationPath]);
             }
         }];

@@ -9,9 +9,9 @@
 "Sections" = "Sections";
 "Section" = "Section";
 "Modules" = "Modules";
-"DownloadingCourseList" = "Refreshing course list...";
-"DownloadingSectionList" = "Refreshing section list...";
-"DownloadingModuleList" = "Refreshing module list...";
+"DownloadingCourseList" = "Loading course list...";
+"DownloadingSectionList" = "Loading sections...";
+"DownloadingModuleList" = "Loading modules...";
 "NotSubscribedToAnyCourse" = "You are not registered with any MyEdu course";
 "NoSection" = "No section";
 "NoModule" = "No module";
@@ -30,5 +30,6 @@
 "StartingDownload" = "Starting download...";
 "DownloadingVideo" = "Downloading video...";
 "DownloadProgressWithFormat" = "%@ of %@";
-"DeleteDownloadedVideoExplanation" = "Delete downloaded video ?\n\nThe file will be deleted and offline playing won't be available anymore.";
+"DeleteDownloadedVideoExplanation" = "Delete downloaded video ?\nThe file will be deleted and offline playing won't be available anymore.";
 "ErrorOccuredWhileDownloadingVideo" = "Sorry, an error occured while downloading the video.";
+"NotAllowedAccessToMyEdu" = "Sorry, you are not allowed to\naccess MyEdu.\n\nYou must be enrolled in a\nMyEdu-hosted course to have access to the platform.";

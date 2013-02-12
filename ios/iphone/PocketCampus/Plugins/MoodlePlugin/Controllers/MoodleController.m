@@ -1,16 +1,18 @@
 
 #import "MoodleController.h"
 
-#import "CoursesListViewController.h"
+#import "MoodleCoursesListViewController.h"
 
 #import "ObjectArchiver.h"
 
+#import "PluginSplitViewController.h"
+
+#import "PCUtils.h"
+
 @interface MoodleController ()
 
-@property (nonatomic, strong) AuthenticationController* authController;
 @property (nonatomic, strong) MoodleService* moodleService;
 @property (nonatomic, strong) TequilaToken* tequilaToken;
-@property (nonatomic, strong) NSMutableArray* loginObservers; //array of PCLoginObservers (def. in AuthenticationController)
 
 @end
 
@@ -29,20 +31,29 @@ static NSString* kDeleteSessionAtInitKey = @"DeleteSessionAtInit";
         }
         self = [super init];
         if (self) {
-            self.loginObservers = [NSMutableArray array];
             [[self class] deleteSessionIfNecessary];
-            CoursesListViewController* coursesListViewController = [[CoursesListViewController alloc] init];
-            coursesListViewController.title = [[self class] localizedName];
-            PluginNavigationController* navController = [[PluginNavigationController alloc] initWithRootViewController:coursesListViewController];
-            navController.pluginIdentifier = [[self class] identifierName];
-            self.mainNavigationController = navController;
+            MoodleCoursesListViewController* coursesListViewController = [[MoodleCoursesListViewController alloc] init];
+            
+            if ([PCUtils isIdiomPad]) {
+                UINavigationController* navController =  [[UINavigationController alloc] initWithRootViewController:coursesListViewController];
+                UIViewController* emptyDetailViewController = [[UIViewController alloc] init]; //splash view controller will be returned by coursesListViewController as PluginSplitViewControllerDelegate
+                PluginSplitViewController* splitViewController = [[PluginSplitViewController alloc] initWithMasterViewController:navController detailViewController:emptyDetailViewController];
+                splitViewController.pluginIdentifier = [[self class] identifierName];
+                splitViewController.delegate = self;
+                self.mainSplitViewController = splitViewController;
+            } else {
+                PluginNavigationController* navController = [[PluginNavigationController alloc] initWithRootViewController:coursesListViewController];
+                navController.pluginIdentifier = [[self class] identifierName];
+                self.mainNavigationController = navController;
+            }
+            
             instance = self;
         }
         return self;
     }
 }
 
-+ (id)sharedInstance {
++ (id)sharedInstanceToRetain {
     @synchronized (self) {
         if (instance) {
             return instance;
@@ -76,7 +87,11 @@ static NSString* kDeleteSessionAtInitKey = @"DeleteSessionAtInit";
                 [ObjectArchiver saveObject:[NSNumber numberWithBool:YES] forKey:kDeleteSessionAtInitKey andPluginName:@"moodle"];
             } else {
                 NSLog(@"-> Moodle received %@ notification", [AuthenticationService logoutNotificationName]);
-                [[MoodleService sharedInstanceToRetain] deleteSession]; //removing stored session
+                MoodleService* moodleService = [MoodleService sharedInstanceToRetain];
+                [moodleService deleteSession]; //removing stored session
+                [moodleService deleteAllDownloadedResources]; //removing all downloaded Moodle files
+                moodleService = nil;
+                [ObjectArchiver deleteAllCachedObjectsForPluginName:@"moodle"];
                 [[MainController publicController] requestLeavePlugin:@"Moodle"];
             }
         }];
@@ -86,75 +101,21 @@ static NSString* kDeleteSessionAtInitKey = @"DeleteSessionAtInit";
 
 #pragma mark - Login observers management
 
-- (void)addLoginObserver:(id)observer operationIdentifier:(NSString*)identifier successBlock:(VoidBlock)successBlock
+- (void)addLoginObserver:(id)observer successBlock:(VoidBlock)successBlock
       userCancelledBlock:(VoidBlock)userCancelledblock failureBlock:(VoidBlock)failureBlock {
     
-    @synchronized(self) {
-        PCLoginObserver* loginObserver = [[PCLoginObserver alloc] init];
-        loginObserver.observer = observer;
-        loginObserver.operationIdentifier = identifier;
-        loginObserver.successBlock = successBlock;
-        loginObserver.userCancelledBlock = userCancelledblock;
-        loginObserver.failureBlock = failureBlock;
-        [self.loginObservers addObject:loginObserver];
-        if(!self.authController) {
-            self.moodleService = [MoodleService sharedInstanceToRetain];
-            self.authController = [AuthenticationController sharedInstance];
-            [self.moodleService getTequilaTokenForMoodleDelegate:self];
-        }
+    [super addLoginObserver:observer successBlock:successBlock userCancelledBlock:userCancelledblock failureBlock:failureBlock];
+    if (!super.authenticationStarted) {
+        super.authenticationStarted = YES;
+        self.moodleService = [MoodleService sharedInstanceToRetain];
+        [self.moodleService getTequilaTokenForMoodleDelegate:self];
     }
 }
 
 - (void)removeLoginObserver:(id)observer {
-    [self removeLoginObserver:observer operationIdentifier:nil];
-}
-
-- (void)removeLoginObserver:(id)observer operationIdentifier:(NSString*)identifier { //pass nil identifier to remove all from observer
-    @synchronized(self) {
-        for (PCLoginObserver* loginObserver in [self.loginObservers copy]) {
-            if (loginObserver.observer == observer && (!identifier || [loginObserver.operationIdentifier isEqualToString:identifier])) {
-                [self.loginObservers removeObject:loginObserver];
-            }
-        }
-        if ([self.loginObservers count] == 0) {
-            [self.moodleService cancelOperationsForDelegate:self]; //abandon login attempt if no more observer interested
-            self.moodleService = nil;
-            self.tequilaToken = nil;
-            self.authController = nil;
-        }
-    }
-}
-
-- (void)cleanAndNotifySuccessToObservers {
-    self.tequilaToken = nil;
-    self.authController = nil;
-    self.moodleService = nil;
-    @synchronized (self) {
-        for (PCLoginObserver* loginObserver in self.loginObservers) {
-            loginObserver.successBlock();
-        }
-    }
-}
-
-- (void)cleanAndNotifyFailureToObservers {
-    self.tequilaToken = nil;
-    self.authController = nil;
-    self.moodleService = nil;
-    @synchronized (self) {
-        for (PCLoginObserver* loginObserver in self.loginObservers) {
-            loginObserver.failureBlock();
-        }
-    }
-}
-
-- (void)cleanAndNotifyUserCancelledToObservers {
-    self.tequilaToken = nil;
-    self.authController = nil;
-    self.moodleService = nil;
-    @synchronized (self) {
-        for (PCLoginObserver* loginObserver in self.loginObservers) {
-            loginObserver.userCancelledBlock();
-        }
+    [super removeLoginObserver:observer];
+    if ([self.loginObservers count] == 0) {
+        [self.moodleService cancelOperationsForDelegate:self]; //abandon login attempt if no more observer interested
     }
 }
 
@@ -184,17 +145,7 @@ static NSString* kDeleteSessionAtInitKey = @"DeleteSessionAtInit";
 }
 
 - (void)serviceConnectionToServerTimedOut {
-    self.authController = nil;
-    self.tequilaToken = nil;
-    self.moodleService = nil;
-    @synchronized (self) {
-        for (PCLoginObserver* loginObserver in [self.loginObservers copy]) {
-            if ([loginObserver.observer respondsToSelector:@selector(serviceConnectionToServerTimedOut)]) {
-                [loginObserver.observer serviceConnectionToServerTimedOut];
-            }
-            [self.loginObservers removeObject:loginObserver];
-        }
-    }
+    [super cleanAndNotifyConnectionToServerTimedOutToObservers];
 }
 
 #pragma mark - AuthenticationCallbackDelegate
@@ -230,8 +181,18 @@ static NSString* kDeleteSessionAtInitKey = @"DeleteSessionAtInit";
     return NSLocalizedStringFromTable(key, [[self class] identifierName], @"");
 }
 
+#pragma mark - UISplitViewControllerDelegate
+
+- (BOOL)splitViewController:(UISplitViewController *)svc shouldHideViewController:(UIViewController *)vc inOrientation:(UIInterfaceOrientation)orientation {
+    /*if (orientation == UIInterfaceOrientationMaskPortrait) {
+     return YES;
+     }*/
+    return NO;
+}
+
 - (void)dealloc
 {
+    [self.moodleService cancelOperationsForDelegate:self];
     [[self class] deleteSessionIfNecessary];
     @synchronized(self) {
         instance = nil;

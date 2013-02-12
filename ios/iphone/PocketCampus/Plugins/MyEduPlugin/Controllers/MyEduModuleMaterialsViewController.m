@@ -12,6 +12,10 @@
 
 #import <MobileCoreServices/MobileCoreServices.h>
 
+#import "UIPopoverController+Additions.h"
+
+#import "GANTracker.h"
+
 @interface MyEduModuleMaterialsViewController ()
 
 @property (nonatomic, strong) MyEduService* myEduService;
@@ -23,6 +27,7 @@
 @property (nonatomic, strong) UIPopoverController* materialsPopOverController;
 @property (nonatomic, strong) UIDocumentInteractionController* docInteractionController;
 @property (nonatomic, weak) UIBarButtonItem* actionButton;
+@property (nonatomic) BOOL isShowingActionMenu;
 
 @end
 
@@ -47,6 +52,8 @@ static NSString* kMyEduModuleMaterialCell = @"MyEduModuleMaterialCell";
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view.
+    [[GANTracker sharedTracker] trackPageview:@"/v3r1/myedu/sections/modules/material" withError:NULL];
+    
     self.webView.scalesPageToFit = YES;
     
     UIViewController* materialsListViewController = [[UIViewController alloc] init]; //will only be visible if more than 1 material
@@ -73,7 +80,7 @@ static NSString* kMyEduModuleMaterialCell = @"MyEduModuleMaterialCell";
         successBlock();
     } else {
         NSLog(@"-> No saved session, loggin in...");
-        [[MyEduController sharedInstance] addLoginObserver:self operationIdentifier:nil successBlock:successBlock userCancelledBlock:^{
+        [[MyEduController sharedInstanceToRetain] addLoginObserver:self successBlock:successBlock userCancelledBlock:^{
             [self error];
         } failureBlock:^{
             [self error];
@@ -95,7 +102,7 @@ static NSString* kMyEduModuleMaterialCell = @"MyEduModuleMaterialCell";
         successBlock();
     } else {
         NSLog(@"-> No saved session, loggin in...");
-        [[MyEduController sharedInstance] addLoginObserver:self operationIdentifier:nil successBlock:successBlock userCancelledBlock:^{
+        [[MyEduController sharedInstanceToRetain] addLoginObserver:self successBlock:successBlock userCancelledBlock:^{
             [self error];
         } failureBlock:^{
             [self error];
@@ -119,14 +126,18 @@ static NSString* kMyEduModuleMaterialCell = @"MyEduModuleMaterialCell";
 
 - (void)materialsListButtonPressed {
     [self.docInteractionController dismissMenuAnimated:NO];
-    [self.materialsPopOverController presentPopoverFromBarButtonItem:self.navigationItem.rightBarButtonItem permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
     CGRect resizedBounds = self.materialsTableView.bounds;
     resizedBounds.size.height = self.materialsTableView.contentSize.height;
     [self.materialsPopOverController setPopoverContentSize:CGSizeMake(resizedBounds.size.width, resizedBounds.size.height) animated:NO];
+    [self.materialsPopOverController togglePopoverFromBarButtonItem:self.navigationItem.rightBarButtonItem permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
 }
 
 - (void)actionButtonPressed {
     [self.materialsPopOverController dismissPopoverAnimated:NO];
+    if (self.isShowingActionMenu) {
+        [self.docInteractionController dismissMenuAnimated:YES];
+        return;
+    }
     BOOL couldShowMenu = [self.docInteractionController presentOptionsMenuFromBarButtonItem:self.actionButton animated:YES];
     if (!couldShowMenu) {
         UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:NSLocalizedStringFromTable(@"Sorry", @"MoodlePlugin", nil) message:NSLocalizedStringFromTable(@"NoActionForThisFile", @"MoodlePlugin", nil) delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
@@ -207,7 +218,7 @@ static NSString* kMyEduModuleMaterialCell = @"MyEduModuleMaterialCell";
 
 - (void)error {
     [self.loadingIndicator stopAnimating];
-    self.centerMessageLabel.text = NSLocalizedStringFromTable(@"ConnectionToServerError", @"PocketCampus", nil);
+    self.centerMessageLabel.text = NSLocalizedStringFromTable(@"ServerError", @"PocketCampus", nil);
     self.centerMessageLabel.hidden = NO;
     self.webView.hidden = YES;
     self.progressView.hidden = YES;
@@ -216,6 +227,7 @@ static NSString* kMyEduModuleMaterialCell = @"MyEduModuleMaterialCell";
 
 #pragma mark - UIDocumentInteractionControllerDelegate
 
+/* Deprecated. Necessary for iOS<=5 */
 - (BOOL)documentInteractionController:(UIDocumentInteractionController *)controller canPerformAction:(SEL)action
 {
     
@@ -225,6 +237,7 @@ static NSString* kMyEduModuleMaterialCell = @"MyEduModuleMaterialCell";
     return NO;
 }
 
+/* Deprecated. Necessary for iOS<=5 */
 - (BOOL)documentInteractionController:(UIDocumentInteractionController *)controller performAction:(SEL)action
 {
     
@@ -241,6 +254,13 @@ static NSString* kMyEduModuleMaterialCell = @"MyEduModuleMaterialCell";
     return success;
 }
 
+- (void)documentInteractionControllerWillPresentOptionsMenu:(UIDocumentInteractionController *)controller {
+    self.isShowingActionMenu = YES;
+}
+
+- (void)documentInteractionControllerDidDismissOptionsMenu:(UIDocumentInteractionController *)controller {
+    self.isShowingActionMenu = NO;
+}
 
 #pragma mark - UITableViewDelegate
 
@@ -302,7 +322,6 @@ static NSString* kMyEduModuleMaterialCell = @"MyEduModuleMaterialCell";
     self.webView.delegate = nil;
     [self.webView stopLoading];
     [self.myEduService cancelOperationsForDelegate:self];
-    [[MyEduController sharedInstance] removeLoginObserver:self];
 }
 
 @end

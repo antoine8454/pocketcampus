@@ -39,19 +39,28 @@ static FoodService* instance __weak = nil;
 }
 
 - (id)thriftServiceClientInstance {
-    return [[[FoodServiceClient alloc] initWithProtocol:[self thriftProtocolInstance]] autorelease];
+    return [[FoodServiceClient alloc] initWithProtocol:[self thriftProtocolInstance]];
 }
 
 - (void)getMealsWithDelegate:(id)delegate {    
     ServiceRequest* operation = [[ServiceRequest alloc] initWithThriftServiceClient:[self thriftServiceClientInstance] service:self delegate:delegate];
-    //operation.keepInCache = YES;
-    //operation.cacheValidity = 3*3600; //3 hours
+    operation.keepInCache = YES;
+    operation.skipCache = YES;
+    operation.cacheValidity = 3600*24;
     operation.serviceClientSelector = @selector(getMeals);
     operation.delegateDidReturnSelector = @selector(getMealsDidReturn:);
     operation.delegateDidFailSelector = @selector(getMealsFailed);
     operation.returnType = ReturnTypeObject;
     [operationQueue addOperation:operation];
-    [operation release];
+}
+
+- (NSArray*)getFromCacheMeals {
+    ServiceRequest* operation = [[ServiceRequest alloc] initForCachedResponseOnlyWithService:self];
+    operation.serviceClientSelector = @selector(getMeals);
+    operation.delegateDidReturnSelector = @selector(getMealsDidReturn:);
+    operation.delegateDidFailSelector = @selector(getMealsFailed);
+    operation.returnType = ReturnTypeObject;
+    return [operation cachedResponseObjectEvenIfStale:YES];
 }
 
 - (void)getRestaurantsWithDelegate:(id)delegate {
@@ -61,7 +70,6 @@ static FoodService* instance __weak = nil;
     operation.delegateDidFailSelector = @selector(getRestaurantsFailed);
     operation.returnType = ReturnTypeObject;
     [operationQueue addOperation:operation];
-    [operation release];
 }
 
 - (void)getSandwichesWithDelegate:(id)delegate; {
@@ -71,7 +79,6 @@ static FoodService* instance __weak = nil;
     operation.delegateDidFailSelector = @selector(getSandwichesFailed);
     operation.returnType = ReturnTypeObject;
     [operationQueue addOperation:operation];
-    [operation release];
 }
 
 - (void)getRating:(Meal*)meal delegate:(id)delegate {
@@ -85,8 +92,6 @@ static FoodService* instance __weak = nil;
     [operation addObjectArgument:meal];
     operation.returnType = ReturnTypeObject;
     [operationQueue addOperation:operation];
-    [operation release];
-
 }
 
 - (void)hasVoted:(NSString*)deviceId delegate:(id)delegate {
@@ -100,7 +105,6 @@ static FoodService* instance __weak = nil;
     [operation addObjectArgument:deviceId];
     operation.returnType = ReturnTypeBool;
     [operationQueue addOperation:operation];
-    [operation release];
 }
 
 - (void)getRatingsWithDelegate:(id)delegate {
@@ -110,10 +114,9 @@ static FoodService* instance __weak = nil;
     operation.delegateDidFailSelector = @selector(getRatingsFailed);
     operation.returnType = ReturnTypeObject;
     [operationQueue addOperation:operation];
-    [operation release];
 }
 
-- (void)setRatingForMeal:(Id)mealId rating:(double)rating deviceId:(NSString*)deviceId delegate:(id)delegate; {
+- (void)setRatingForMeal:(Id)mealId rating:(double)rating deviceId:(NSString*)deviceId delegate:(id)delegate {
     //Id is primitive type (long long), rating is primitive (double) => cannot be checked
     if (![deviceId isKindOfClass:[NSString class]]) {
         @throw [NSException exceptionWithName:@"bad deviceId" reason:@"deviceId is either nil or not of class NSString" userInfo:nil];
@@ -127,7 +130,6 @@ static FoodService* instance __weak = nil;
     [operation addObjectArgument:deviceId];
     operation.returnType = ReturnTypeInt;
     [operationQueue addOperation:operation];
-    [operation release];
 }
 
 - (void)dealloc

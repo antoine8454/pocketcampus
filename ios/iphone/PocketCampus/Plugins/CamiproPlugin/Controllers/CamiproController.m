@@ -38,7 +38,7 @@ static CamiproController* instance __weak = nil;
     }
 }
 
-+ (id)sharedInstance {
++ (id)sharedInstanceToRetain {
     @synchronized (self) {
         if (instance) {
             return instance;
@@ -48,12 +48,6 @@ static CamiproController* instance __weak = nil;
 #else
         return [[[[self class] alloc] init] autorelease];
 #endif
-    }
-}
-
-- (void)refresh {
-    if (((CamiproViewController*)(self.mainNavigationController.visibleViewController)).shouldRefresh) {
-        [((CamiproViewController*)(self.mainNavigationController.visibleViewController)) refresh];
     }
 }
 
@@ -79,6 +73,8 @@ static CamiproController* instance __weak = nil;
             } else {
                 NSLog(@"-> Camipro received %@ notification", [AuthenticationService logoutNotificationName]);
                 [CamiproService saveSessionId:nil]; //removing stored session
+                [ObjectArchiver deleteAllCachedObjectsForPluginName:@"camipro"];
+                [[MainController publicController] requestLeavePlugin:@"Camipro"];
             }
         }];
         initObserversDone = YES;

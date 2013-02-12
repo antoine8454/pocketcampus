@@ -9,9 +9,9 @@
 "Sections" = "Sections";
 "Section" = "Section";
 "Modules" = "Modules";
-"DownloadingCourseList" = "Téléchargement de la liste des cours...";
-"DownloadingSectionList" = "Téléchargement de la liste des sections...";
-"DownloadingModuleList" = "Téléchargement de la liste des modules...";
+"DownloadingCourseList" = "Chargement de la liste des cours...";
+"DownloadingSectionList" = "Chargement des sections...";
+"DownloadingModuleList" = "Chargement des modules...";
 "NotSubscribedToAnyCourse" = "Vous n'êtes inscrit à aucun cours MyEdu";
 "NoSection" = "Aucune section";
 "NoModule" = "Aucun module";
@@ -30,5 +30,6 @@
 "StartingDownload" = "Démarrage du téléchargement...";
 "DownloadingVideo" = "Téléchargement de la vidéo...";
 "DownloadProgressWithFormat" = "%@ sur %@";
-"DeleteDownloadedVideoExplanation" = "Supprimer la vidéo téléchargée ?\n\nLe fichier sera supprimé et la lecture hors-ligne ne sera plus disponible.";
+"DeleteDownloadedVideoExplanation" = "Supprimer la vidéo téléchargée ?\nLe fichier sera supprimé et la lecture hors-ligne ne sera plus disponible.";
 "ErrorOccuredWhileDownloadingVideo" = "Désolé, une erreur est survenue pendant le téléchargement de la vidéo.";
+"NotAllowedAccessToMyEdu" = "Désolé, vous n'êtes pas autorisé à accéder à MyEdu.\n\nVous devez être inscrit à un cours utilisant MyEdu pour pouvoir y accéder.";

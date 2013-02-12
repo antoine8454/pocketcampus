@@ -20,18 +20,37 @@
 
 #import "AboutPCViewController.h"
 
-static NSString* kStandardSettingDefaultCell = @"StandardSettingDefaultCell";
+#import "AuthenticationService.h"
+
+#import "MainController.h"
+
+#import "MainMenuViewController.h"
+
+
+static const int kAccountsSection = 0;
+static const int kMainMenuSection = 1;
+static const int kAboutSection = 2;
+
+static const int kEditMainMenuRow = 0;
+static const int kRestoreDefaultMainMenuRow = 1;
+
+static const int kRatePCRow = 0;
+static const int kLikePCFBRow = 1;
+static const int kAboutRow = 2;
+
+@interface GlobalSettingsViewController ()
+
+@property (nonatomic, weak) MainController* mainController;
+
+@end
 
 @implementation GlobalSettingsViewController
 
-@synthesize tableView;
-
-- (id)init
+- (id)initWithMainController:(MainController*)mainController
 {
     self = [super initWithNibName:@"GlobalSettingsView" bundle:nil];
     if (self) {
-        // Custom initialization
-        textEditing = NO;
+        self.mainController = mainController;
     }
     return self;
 }
@@ -42,20 +61,19 @@ static NSString* kStandardSettingDefaultCell = @"StandardSettingDefaultCell";
 	// Do any additional setup after loading the view.
     [[GANTracker sharedTracker] trackPageview:@"/v3r1/dashboard/settings" withError:NULL];
     self.title = NSLocalizedStringFromTable(@"Settings", @"PocketCampus", nil);
-    tableView.backgroundColor = [UIColor clearColor];
-    UIView* backgroundView = [[UIView alloc] initWithFrame:tableView.frame];
+    self.tableView.backgroundColor = [UIColor clearColor];
+    UIView* backgroundView = [[UIView alloc] initWithFrame:self.tableView.frame];
     backgroundView.backgroundColor = [PCValues backgroundColor1];;
-    tableView.backgroundView = backgroundView;
-    [backgroundView release];
+    self.tableView.backgroundView = backgroundView;
     UIBarButtonItem* button = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedStringFromTable(@"Done", @"PocketCampus", nil) style:UIBarButtonItemStyleBordered target:self action:@selector(doneBarButtonPressed)];
     [self.navigationItem setRightBarButtonItem:button animated:YES];
-    [button release];
-    cancelButtonDisplayed = NO;
+
     
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-    [tableView deselectRowAtIndexPath:[tableView indexPathForSelectedRow] animated:animated];
+    [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationAutomatic];
+    [self.tableView deselectRowAtIndexPath:[self.tableView indexPathForSelectedRow] animated:animated];
 }
 
 - (void)viewDidUnload
@@ -95,26 +113,57 @@ static NSString* kStandardSettingDefaultCell = @"StandardSettingDefaultCell";
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     switch (indexPath.section) {
-        case 0: //accounts
+        case kAccountsSection: //accounts
             switch (indexPath.row) {
                 case 0: //gaspar account
                 {
                     GasparViewController* viewController = [[GasparViewController alloc] init];
                     [self.navigationController pushViewController:viewController animated:YES];
-                    [viewController release];
                     break;
                 }
                 default:
                     break;
             }
             break;
-        case 1: //about
+        case kMainMenuSection:
             switch (indexPath.row) {
-                case 0: //About PC
+                case kEditMainMenuRow:
+                {
+                    [self.mainController.mainMenuViewController setEditing:YES];
+                    [self.presentingViewController dismissViewControllerAnimated:YES completion:NULL];
+                    break;
+                }
+                case kRestoreDefaultMainMenuRow:
+                {
+                    [self.mainController restoreDefaultMainMenu];
+                    [self.presentingViewController dismissViewControllerAnimated:YES completion:NULL];
+                    break;
+                }
+                default:
+                    break;
+            }
+            break;
+        case kAboutSection: //about
+            switch (indexPath.row) {
+                case kRatePCRow:
+                {
+                    [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
+                    NSURL *url = [NSURL URLWithString:@"https://itunes.apple.com/ch/app/epfl/id549799535"];
+                    [[UIApplication sharedApplication] openURL:url];
+                    break;
+                }
+                case kLikePCFBRow:
+                {
+                    [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
+                    //
+                    NSURL *url = [NSURL URLWithString:@"http://facebook.com/pocketcampus"];
+                    [[UIApplication sharedApplication] openURL:url];
+                    break;
+                }
+                case kAboutRow:
                 {
                     AboutPCViewController* viewController = [[AboutPCViewController alloc] init];
                     [self.navigationController pushViewController:viewController animated:YES];
-                    [viewController release];
                     break;
                 }
                 default:
@@ -129,11 +178,12 @@ static NSString* kStandardSettingDefaultCell = @"StandardSettingDefaultCell";
 
 - (NSString*)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
     switch (section) {
-        case 0: //gaspar account
+        case kAccountsSection: //gaspar account
             return NSLocalizedStringFromTable(@"Accounts", @"PocketCampus", nil);
-        case 1: //about
+        case kMainMenuSection:
+            return NSLocalizedStringFromTable(@"MainMenu", @"PocketCampus", nil);
+        case kAboutSection: //about
             return @"PocketCampus";
-            break;
         default:
             return @"";
             break;
@@ -141,42 +191,79 @@ static NSString* kStandardSettingDefaultCell = @"StandardSettingDefaultCell";
 }
 
 - (UITableViewCell*)tableView:(UITableView *)tableView_ cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    UITableViewCell* cell;
+    
+    UITableViewCell* cell = nil;
     
     switch (indexPath.section) {
-        case 0: //gaspar account
+        case kAccountsSection:
         {
-            cell = [tableView dequeueReusableCellWithIdentifier:kStandardSettingDefaultCell];
-            if (!cell) {
-                cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:kStandardSettingDefaultCell] autorelease];
-                cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
-            }
+            cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:nil];
+            cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+            cell.detailTextLabel.textColor = [UIColor colorWithWhite:0.4 alpha:1.0];
             cell.textLabel.text = [GasparViewController localizedTitle];
-            return cell;
-            
-        }
-        case 1: //about
-        {
-            cell = [tableView dequeueReusableCellWithIdentifier:kStandardSettingDefaultCell];
-            if (!cell) {
-                cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:kStandardSettingDefaultCell] autorelease];
-                cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+            NSString* username = [AuthenticationService savedUsername];
+            if (username) {
+                cell.detailTextLabel.text = username;
+            } else {
+                cell.detailTextLabel.text = @"";
             }
-            cell.textLabel.text = NSLocalizedStringFromTable(@"About", @"PocketCampus", nil);
-            return cell;
+            break;
+        }
+        case kMainMenuSection:
+        {
+            switch (indexPath.row) {
+                case kEditMainMenuRow:
+                    cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:nil];
+                    cell.textLabel.text = NSLocalizedStringFromTable(@"EditMainMenu", @"PocketCampus", nil);
+                    break;
+                case kRestoreDefaultMainMenuRow:
+                    cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:nil];
+                    cell.textLabel.text = NSLocalizedStringFromTable(@"RestoreDefaultMainMenu", @"PocketCampus", nil);
+                    break;
+                default:
+                    break;
+            }
+            break;
+        }
+        case kAboutSection:
+        {
+            switch (indexPath.row) {
+                case kRatePCRow:
+                    cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:nil];
+                    cell.textLabel.text = NSLocalizedStringFromTable(@"RatePCAppStore", @"PocketCampus", nil);
+                    //cell.detailTextLabel.text = NSLocalizedStringFromTable(@"RatePCAppStoreSubtitle", @"PocketCampus", nil);
+                    cell.imageView.image = [UIImage imageNamed:@"AppLogoCellImage"];
+                    break;
+                case kRestoreDefaultMainMenuRow:
+                    cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:nil];
+                    cell.textLabel.text = NSLocalizedStringFromTable(@"LikePConFB", @"PocketCampus", nil);
+                    //cell.detailTextLabel.text = NSLocalizedStringFromTable(@"LikePConFBSubtitle", @"PocketCampus", nil);
+                    cell.imageView.image = [UIImage imageNamed:@"FacebookLikeCellImage"];
+                    break;
+                case kAboutRow:
+                    cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:nil];
+                    cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+                    cell.textLabel.text = NSLocalizedStringFromTable(@"About", @"PocketCampus", nil);
+                    break;
+                default:
+                    break;
+            }
+            break;
         }
         default:
             break;
     }
-    return nil;
+    return cell;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     switch (section) {
-        case 0: //gaspar account
+        case kAccountsSection:
             return 1;
-        case 1: //about
-            return 1;
+        case kMainMenuSection:
+            return 2;
+        case kAboutSection:
+            return 3;
         default:
             return 0;
             break;
@@ -184,7 +271,7 @@ static NSString* kStandardSettingDefaultCell = @"StandardSettingDefaultCell";
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 2;
+    return 3;
 }
 
 @end

@@ -12,12 +12,14 @@
 
 #import "MyEduService.h"
 
-@interface MyEduModuleVideoViewController : UIViewController<UIWebViewDelegate, NSURLConnectionDownloadDelegate, UIActionSheetDelegate>
+@interface MyEduModuleVideoViewController : UIViewController<UIWebViewDelegate, ASIHTTPRequestDelegate, UIActionSheetDelegate>
 
-@property (nonatomic, weak) IBOutlet UIWebView* webView;
 @property (nonatomic, weak) IBOutlet UIActivityIndicatorView* loadingIndicator;
 @property (nonatomic, weak) IBOutlet UILabel* centerMessageLabel;
+@property (nonatomic, weak) IBOutlet UIButton* playbackRateButton;
 
 - (id)initWithMyEduModule:(MyEduModule*)module;
+
+- (void)destroyVideoPlayer; //call when MyEduModuleVideoViewController should be deallocated to be sure player does not prevent it (when playing)
 
 @end

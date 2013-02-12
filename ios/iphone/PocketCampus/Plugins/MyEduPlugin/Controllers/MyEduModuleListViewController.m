@@ -20,6 +20,12 @@
 
 #import "MyEduModuleDetailViewController.h"
 
+#import "PCTableViewCellAdditions.h"
+
+#import "GANTracker.h"
+
+static const NSTimeInterval kRefreshValiditySeconds = 86400.0; //1 day
+
 @interface MyEduModuleListViewController ()
 
 @property (nonatomic, strong) MyEduService* myEduService;
@@ -28,8 +34,8 @@
 @property (nonatomic, strong) NSArray* modules;
 @property (nonatomic, strong) MyEduTequilaToken* tequilaToken;
 @property (nonatomic, strong) PCRefreshControl* pcRefreshControl;
-@property (nonatomic, strong) NSIndexPath* selectedModuleIndexPath;
-@property (nonatomic, strong) NSArray* cells;
+@property (nonatomic, strong) MyEduModule* selectedMyEduModule;
+@property (nonatomic, strong) NSDictionary* cellForMyEduModule;
 
 @end
 
@@ -48,7 +54,7 @@
         if (self.modules) {
             [self initCellsWithModules];
         }
-        self.pcRefreshControl = [[PCRefreshControl alloc] initWithTableViewController:self];
+        self.pcRefreshControl = [[PCRefreshControl alloc] initWithTableViewController:self pluginName:@"myedu" refreshedDataIdentifier:[NSString stringWithFormat:@"myEduSectionList-%d-%d", self.course.iId, self.section.iId]];
         [self.pcRefreshControl setTarget:self selector:@selector(refresh)];
     }
     return self;
@@ -57,14 +63,16 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    [[GANTracker sharedTracker] trackPageview:@"/v3r1/myedu/sections/modules" withError:NULL];
     /*UIView* backgroundView = [[UIView alloc] init];
      backgroundView.backgroundColor = [UIColor whiteColor];
      self.tableView.backgroundView = backgroundView;
      self.tableView.backgroundColor = [UIColor clearColor];*/
 }
 
-- (void)viewDidAppear:(BOOL)animated {
-    if (!self.modules) {
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    if (!self.modules || [self.pcRefreshControl shouldRefreshDataForValidity:kRefreshValiditySeconds]) {
         [self refresh];
     }
 }
@@ -74,6 +82,18 @@
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
+
+- (NSUInteger)supportedInterfaceOrientations //iOS 6
+{
+    return UIInterfaceOrientationMaskAllButUpsideDown;
+    
+}
+
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation //iOS 5
+{
+    return UIInterfaceOrientationIsLandscape(interfaceOrientation) || (UIInterfaceOrientationPortrait);
+}
+
 
 #pragma mark - refresh control
 
@@ -91,7 +111,7 @@
         successBlock();
     } else {
         NSLog(@"-> No saved session, loggin in...");
-        [[MyEduController sharedInstance] addLoginObserver:self operationIdentifier:nil successBlock:successBlock userCancelledBlock:^{
+        [[MyEduController sharedInstanceToRetain] addLoginObserver:self successBlock:successBlock userCancelledBlock:^{
             [self.pcRefreshControl endRefreshing];
         } failureBlock:^{
             [self error];
@@ -103,10 +123,10 @@
     if (!self.modules) {
         return;
     }
-    NSMutableArray* cellsTmp = [NSMutableArray arrayWithCapacity:[self.modules count]];
+    NSMutableDictionary* cellsTmp = [NSMutableDictionary dictionaryWithCapacity:self.modules.count];
     
     [self.modules enumerateObjectsUsingBlock:^(MyEduModule* module, NSUInteger idx, BOOL *stop) {
-        UITableViewCell* cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:nil];
+        PCTableViewCellAdditions* cell = [[PCTableViewCellAdditions alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:nil];
         cell.selectionStyle = UITableViewCellSelectionStyleGray;
         cell.textLabel.font = [UIFont boldSystemFontOfSize:18.0];
         cell.textLabel.numberOfLines = 2;
@@ -115,8 +135,11 @@
         cell.detailTextLabel.font = [UIFont systemFontOfSize:12.0];
         
         if ([MyEduService localPathOfVideoForModule:module nilIfNoFile:YES]) {
-            UIImageView* downloadedImageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"DownloadedRectSmall"]];
-            cell.accessoryView = downloadedImageView;
+            cell.downloadedIndicationVisible = YES;
+        }
+        
+        if ([self.selectedMyEduModule isEqual:module]) {
+            cell.durablySelected = YES;
         }
         
         [self.myEduService removeDownloadObserver:self forVideoModule:module];
@@ -124,43 +147,50 @@
             cell.detailTextLabel.text = [NSString stringWithFormat:@"      %@", NSLocalizedStringFromTable(@"StartingDownload", @"MyEduPlugin", nil)];
             [cell setNeedsLayout];
         } finishBlock:^(NSURL *fileLocalURL) {
-            UIImageView* downloadedImageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"DownloadedRectSmall"]];
-            cell.accessoryView = downloadedImageView;
+            [cell setDownloadedIndicationVisible:YES];
             cell.detailTextLabel.text = nil;
         } progressBlock:^(unsigned long long nbBytesDownloaded, unsigned long long nbBytesToDownload, float ratio) {
             NSString* text = [NSString stringWithFormat:@"      %@ %d%%", NSLocalizedStringFromTable(@"DownloadingVideo", @"MyEduPlugin", nil), (int)(ratio*100)];
             cell.detailTextLabel.text = text;
             [cell setNeedsLayout];
         } cancelledBlock:^{
-            cell.accessoryView = nil;
+            [cell setDownloadedIndicationVisible:NO];
             cell.detailTextLabel.text = nil;
             [cell setNeedsLayout];
         } failureBlock:^(int statusCode) {
-            cell.accessoryView = nil;
+           [cell setDownloadedIndicationVisible:NO];
             cell.detailTextLabel.text = nil;
             [cell setNeedsLayout];
         } deletedBlock:^{
-            cell.accessoryView = nil;
+            [cell setDownloadedIndicationVisible:NO];
             cell.detailTextLabel.text = nil;
             [cell setNeedsLayout];
         }];
         
-        [cellsTmp addObject:cell];
+        cellsTmp[(id<NSCopying>)module] = cell;
     }];
-    self.cells = [cellsTmp copy];
+    self.cellForMyEduModule = [cellsTmp copy];
 }
 
 #pragma mark - MyEduServiceDelegate
 
 - (void)getSectionDetailsForRequest:(MyEduSectionDetailsRequest*)request didReturn:(MyEduSectionDetailsReply*)reply {
-    [[MyEduController sharedInstance] removeLoginObserver:self];
     switch (reply.iStatus) {
         case 200:
-            self.modules = reply.iMyEduModules;
+        {
+            NSMutableArray* modulesWithoutHidden = [reply.iMyEduModules mutableCopy];
+            for (MyEduModule* module in reply.iMyEduModules) {
+                if (!module.iVisible) {
+                    [modulesWithoutHidden removeObject:module];
+                }
+            }
+            self.modules = [modulesWithoutHidden copy]; //non-mutable
             [self initCellsWithModules];
             [self.tableView reloadData];
             [self.pcRefreshControl endRefreshing];
+            [self.pcRefreshControl markRefreshSuccessful];
             break;
+        }
         case 407:
             [self.myEduService deleteSession];
             [self startGetSectionDetailsRequest];
@@ -172,25 +202,20 @@
 }
 
 - (void)getSectionDetailsFailedForRequest:(MyEduSectionDetailsRequest *)request {
-    [[MyEduController sharedInstance] removeLoginObserver:self];
     [self error];
 }
 
 - (void)error {
     self.pcRefreshControl.type = RefreshControlTypeProblem;
-    self.pcRefreshControl.message = NSLocalizedStringFromTable(@"ConnectionToServerErrorShort", @"PocketCampus", nil);
-    if (!self.modules) {
-        [[[UIAlertView alloc] initWithTitle:NSLocalizedStringFromTable(@"Error", @"PocketCampus", nil) message:NSLocalizedStringFromTable(@"ConnectionToServerError", @"PocketCampus", nil) delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil] show];
-    }
+    self.pcRefreshControl.message = NSLocalizedStringFromTable(@"ServerErrorShort", @"PocketCampus", nil);
+    [PCUtils showServerErrorAlert];
     [self.pcRefreshControl hideInTimeInterval:2.0];
 }
 
 - (void)serviceConnectionToServerTimedOut {
     self.pcRefreshControl.type = RefreshControlTypeProblem;
     self.pcRefreshControl.message = NSLocalizedStringFromTable(@"ConnectionToServerTimedOutShort", @"PocketCampus", nil);
-    if (!self.modules) {
-        [[[UIAlertView alloc] initWithTitle:NSLocalizedStringFromTable(@"Error", @"PocketCampus", nil) message:NSLocalizedStringFromTable(@"ConnectionToServerTimedOut", @"PocketCampus", nil) delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil] show];
-    }
+    [PCUtils showConnectionToServerTimedOutAlert];
     [self.pcRefreshControl hideInTimeInterval:2.0];
 }
 
@@ -199,7 +224,10 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     NSInteger selectedTabIndex = 0;
-    if ([self.selectedModuleIndexPath isEqual:indexPath]) {
+    
+    MyEduModule* module = self.modules[indexPath.row];
+    
+    if (self.splitViewController && [self.selectedMyEduModule isEqual:module]) {
         return;
     }
     
@@ -208,15 +236,20 @@
         selectedTabIndex = controller.tabBarController.selectedIndex;
     }
     
-    MyEduModule* module = self.modules[indexPath.row];
     MyEduModuleDetailViewController* detailViewController = [[MyEduModuleDetailViewController alloc] initWithModule:module section:self.section course:self.course];
-    self.selectedModuleIndexPath = indexPath;
     
-    if (self.splitViewController) {
+    if (self.splitViewController) { //iPad
+        PCTableViewCellAdditions* prevCell = self.cellForMyEduModule[self.selectedMyEduModule];
+        prevCell.durablySelected = NO;
+        self.selectedMyEduModule = module;
+        
+        PCTableViewCellAdditions* newCell = self.cellForMyEduModule[module];
+        newCell.durablySelected = YES;
+        
         self.splitViewController.viewControllers = @[self.splitViewController.viewControllers[0], detailViewController];
         detailViewController.tabBarController.selectedIndex = selectedTabIndex;
-    } else {
-        //TODO push on nav controller (iPhone)
+    } else { //iPhone
+        [self.navigationController pushViewController:detailViewController animated:YES];
     }
 }
 
@@ -225,23 +258,23 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if (self.modules && [self.modules count] == 0) {
-        if (indexPath.row == 2) {
+        if (indexPath.row == 1) {
             return [[PCCenterMessageCell alloc] initWithMessage:NSLocalizedStringFromTable(@"NoModule", @"MyEduPlugin", nil)];
         } else {
-            return [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:nil];
+            return [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:nil]; //two empty cells first
         }
     }
     
-    UITableViewCell* cell = self.cells[indexPath.row];
+    MyEduModule* module = self.modules[indexPath.row];
     
-    return cell;
+    return self.cellForMyEduModule[module];
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     // Return the number of rows in the section.
     if ([self.modules count] == 0) {
-        return 3; //first empty cell, second cell says no content
+        return 2; //first empty cell, second cell says no content
     }
     return [self.modules count];
 }

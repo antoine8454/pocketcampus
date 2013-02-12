@@ -28,8 +28,7 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-	self.navBar.tintColor = [PCValues pocketCampusRed];
-    //self.view.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"LightGrayTextureBackground"]];
+    self.view.backgroundColor = [PCValues backgroundColor1];
 }
 
 - (void)didReceiveMemoryWarning

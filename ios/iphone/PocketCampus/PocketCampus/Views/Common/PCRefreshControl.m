@@ -12,6 +12,7 @@
 
 #import "PCUtils.h"
 
+#import "ObjectArchiver.h"
 
 @interface PCRefreshControl ()
 
@@ -22,6 +23,9 @@
 @property (nonatomic, strong) MSPullToRefreshController* msPtRController;
 @property (nonatomic, weak) id target;
 @property (nonatomic) SEL selector;
+@property (nonatomic, copy) NSString* refreshedDataIdentifier;
+@property (nonatomic, copy) NSString* pluginName;
+@property (nonatomic, readwrite, strong) NSDate* lastSuccessfullRefreshDate;
 @property (nonatomic) BOOL engagedRefreshProgrammatically;
 @property (nonatomic, strong) NSTimer* showHideTimer;
 @property (nonatomic, strong) UIView* containerView;
@@ -37,6 +41,9 @@
 - (id)initWithTableViewController:(UITableViewController*)tableViewController {
     self = [super init];
     if (self) {
+        if (!tableViewController) {
+            @throw [NSException exceptionWithName:@"illegal argument" reason:@"tableviewcontroller cannot nil" userInfo:nil];
+        }
         self.tableViewController = tableViewController;
         self.tableView = self.tableViewController.tableView;
         _type = -1;
@@ -50,6 +57,7 @@
             self.usesUIRefreshControl = NO;
             self.msPtRController = [[MSPullToRefreshController alloc] initWithScrollView:self.tableView delegate:self];
             self.messageLabel = [[UILabel alloc] initWithFrame:CGRectMake(10.0, self.tableView.frame.size.height-25.0, self.tableView.frame.size.width-20.0, 20.0)];
+            self.messageLabel.autoresizingMask = UIViewAutoresizingFlexibleWidth;
             self.messageLabel.numberOfLines = 0;
             self.messageLabel.font = [UIFont boldSystemFontOfSize:13.0];
             self.messageLabel.shadowOffset = [PCValues shadowOffset1];
@@ -62,9 +70,31 @@
             [self.containerView addSubview:self.messageLabel];
             
             //self.containerView.backgroundColor = [UIColor yellowColor];
-            
+            self.containerView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
             self.type = RefreshControlTypeDefault;
             [self.tableView addSubview:self.containerView];
+        }
+    }
+    return self;
+}
+
+- (id)initWithTableViewController:(UITableViewController*)tableViewController pluginName:(NSString*)pluginName  refreshedDataIdentifier:(NSString*)dataIdentifier; {
+    
+    if (!pluginName || pluginName.length == 0) {
+        @throw [NSException exceptionWithName:@"illegal argument" reason:@"pluginName cannot be nil or length 0" userInfo:nil];
+    }
+    
+    if (!dataIdentifier || dataIdentifier.length == 0) {
+        @throw [NSException exceptionWithName:@"illegal argument" reason:@"refreshedDataIdentifier cannot be nil or length 0" userInfo:nil];
+    }
+    
+    self = [self initWithTableViewController:tableViewController];
+    if (self) {
+        self.pluginName = pluginName;
+        self.refreshedDataIdentifier = dataIdentifier;
+        self.lastSuccessfullRefreshDate = (NSDate*)[ObjectArchiver objectForKey:[self keyForLastRefresh] andPluginName:self.pluginName isCache:YES];
+        if (self.lastSuccessfullRefreshDate) {
+            [self setMessage:nil];
         }
     }
     return self;
@@ -93,6 +123,11 @@
 }
 
 - (void)setTarget:(id)target selector:(SEL)selector {
+    
+    if (!target) {
+        @throw [NSException exceptionWithName:@"illegal argument" reason:@"target cannot be nil" userInfo:nil];
+    }
+    
     if (self.usesUIRefreshControl) {
         [self.refreshControl removeTarget:self.target action:self.selector forControlEvents:UIControlEventValueChanged];
         [self.refreshControl addTarget:self action:@selector(uiRefreshControlValueChanged) forControlEvents:UIControlEventValueChanged];
@@ -116,11 +151,52 @@
     }
 }
 
-- (void)setMessage:(NSString *)message {
-    if (!message) {
-        message = @"";
+- (NSString*)keyForLastRefresh {
+    return [NSString stringWithFormat:@"pcRefreshControlLastRefreshDate-%u", [self.refreshedDataIdentifier hash]];
+}
+
+- (void)markRefreshSuccessful {
+    if (!self.refreshedDataIdentifier) {
+        @throw [NSException exceptionWithName:@"Illegal operation" reason:@"PCRefreshControl does not support markRefreshSuccessful without being initilized with a refreshTaskUniqueIdentifier" userInfo:nil];
     }
-    _message = [message copy];
+    self.lastSuccessfullRefreshDate = [NSDate date]; //now
+    [self setMessage:nil]; //will set last message to default => last refresh message
+    if (![ObjectArchiver saveObject:self.lastSuccessfullRefreshDate forKey:[self keyForLastRefresh] andPluginName:self.pluginName isCache:YES]) {
+        NSLog(@"-> Error while markRefreshSuccessful");
+    }
+    
+}
+
+- (BOOL)shouldRefreshDataForValidity:(NSTimeInterval)validitySeconds {
+    if (!self.refreshedDataIdentifier) {
+        return YES;
+    }
+    NSTimeInterval diffWithLastRefresh = [[NSDate date] timeIntervalSinceDate:self.lastSuccessfullRefreshDate];
+    if (diffWithLastRefresh > validitySeconds) {
+        return YES;
+    }
+    return NO;
+}
+
+- (NSString*)timeStringForLastRefresh {
+    if (!self.lastSuccessfullRefreshDate) {
+        return NSLocalizedStringFromTable(@"LastUpdateNever", @"PocketCampus", nil);
+    }
+    NSDateFormatter* dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setTimeStyle:NSDateFormatterShortStyle];
+    [dateFormatter setDateStyle:NSDateFormatterShortStyle];
+    return [NSString stringWithFormat:@"%@ %@", NSLocalizedStringFromTable(@"LastUpdate", @"PocketCampus", nil),[dateFormatter stringFromDate:self.lastSuccessfullRefreshDate]];
+}
+
+- (void)setMessage:(NSString *)message {
+    if (!message || [message isEqualToString:@""]) {
+        if (self.refreshedDataIdentifier) {
+            message = [self timeStringForLastRefresh];
+        } else {
+            message = @"";
+        }
+    }
+    _message = [message copy]; //DO NOT USE self.message because this is THIS method (would cause infinite recursion)
     if (self.usesUIRefreshControl) {
         if (self.type == RefreshControlTypeProblem) {
             self.refreshControl.attributedTitle = [[NSAttributedString alloc] initWithString:message attributes:[NSDictionary dictionaryWithObject:self.problemColor forKey:NSForegroundColorAttributeName]];
@@ -143,6 +219,7 @@
             [self.signView removeFromSuperview];
             self.signView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"ArrowDownCircle"]];
             self.signView.center = CGPointMake(self.containerView.center.x, self.containerView.frame.size.height-25.0);
+            self.signView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin;
             [self.containerView addSubview:self.signView];
             self.messageLabel.hidden = YES;
         }
@@ -153,6 +230,7 @@
         } else {
             UIActivityIndicatorView* activityIndicator __block = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
             activityIndicator.center = CGPointMake(self.containerView.center.x, self.containerView.frame.size.height-40.0);
+            activityIndicator.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin;
             activityIndicator.alpha = 0.0;
             [activityIndicator startAnimating];
             [self.containerView addSubview:activityIndicator];
@@ -188,7 +266,7 @@
             self.messageLabel.hidden = NO;
         }
     } else {
-        @throw [NSException exceptionWithName:@"bad argument" reason:@"imageType must be of enum type RefreshControlImageType" userInfo:nil];
+        @throw [NSException exceptionWithName:@"illegal argument" reason:@"imageType must be of enum type RefreshControlImageType" userInfo:nil];
     }
     _type = type;
 }
@@ -275,6 +353,7 @@
 }
 
 - (void)hideInTimeInterval:(NSTimeInterval)timeInterval {
+    
     if (!self.isVisible) {
         return;
     }

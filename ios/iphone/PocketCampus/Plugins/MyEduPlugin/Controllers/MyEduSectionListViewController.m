@@ -22,6 +22,10 @@
 
 #import "MyEduCourseInfoViewController.h"
 
+#import "GANTracker.h"
+
+static const NSTimeInterval kRefreshValiditySeconds = 345600.0; //4 days
+
 @interface MyEduSectionListViewController ()
 
 @property (nonatomic, strong) MyEduService* myEduService;
@@ -45,7 +49,7 @@ static NSString* kMyEduSectionListCell = @"MyEduSectionListCell";
         self.title = NSLocalizedStringFromTable(@"Sections", @"MyEduPlugin", nil);
         self.myEduService = [MyEduService sharedInstanceToRetain];
         self.sections = [self.myEduService getFromCacheCourseDetailsForRequest:[[MyEduCourseDetailsRequest alloc] initWithIMyEduRequest:[self.myEduService createMyEduRequest] iCourseCode:self.course.iCode]].iMyEduSections;
-        self.pcRefreshControl = [[PCRefreshControl alloc] initWithTableViewController:self];
+        self.pcRefreshControl = [[PCRefreshControl alloc] initWithTableViewController:self pluginName:@"myedu" refreshedDataIdentifier:[NSString stringWithFormat:@"myEduSectionList-%d", self.course.iId]];
         [self.pcRefreshControl setTarget:self selector:@selector(refresh)];
     }
     return self;
@@ -54,14 +58,16 @@ static NSString* kMyEduSectionListCell = @"MyEduSectionListCell";
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    [[GANTracker sharedTracker] trackPageview:@"/v3r1/myedu/sections" withError:NULL];
     /*UIView* backgroundView = [[UIView alloc] init];
      backgroundView.backgroundColor = [UIColor whiteColor];
      self.tableView.backgroundView = backgroundView;
      self.tableView.backgroundColor = [UIColor clearColor];*/
 }
 
-- (void)viewDidAppear:(BOOL)animated {
-    if (!self.sections) {
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    if (!self.sections || [self.pcRefreshControl shouldRefreshDataForValidity:kRefreshValiditySeconds]) {
         [self refresh];
     }
 }
@@ -71,6 +77,18 @@ static NSString* kMyEduSectionListCell = @"MyEduSectionListCell";
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
+
+- (NSUInteger)supportedInterfaceOrientations //iOS 6
+{
+    return UIInterfaceOrientationMaskAllButUpsideDown;
+    
+}
+
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation //iOS 5
+{
+    return UIInterfaceOrientationIsLandscape(interfaceOrientation) || (UIInterfaceOrientationPortrait);
+}
+
 
 #pragma mark - refresh control
 
@@ -88,7 +106,7 @@ static NSString* kMyEduSectionListCell = @"MyEduSectionListCell";
         successBlock();
     } else {
         NSLog(@"-> No saved session, loggin in...");
-        [[MyEduController sharedInstance] addLoginObserver:self operationIdentifier:nil successBlock:successBlock userCancelledBlock:^{
+        [[MyEduController sharedInstanceToRetain] addLoginObserver:self successBlock:successBlock userCancelledBlock:^{
             [self.pcRefreshControl endRefreshing];
         } failureBlock:^{
             [self error];
@@ -105,12 +123,12 @@ static NSString* kMyEduSectionListCell = @"MyEduSectionListCell";
 #pragma mark - MyEduServiceDelegate
 
 - (void)getCourseDetailsForRequest:(MyEduCourseDetailsRequest*)request didReturn:(MyEduCourseDetailsReply*)reply {
-    [[MyEduController sharedInstance] removeLoginObserver:self];
     switch (reply.iStatus) {
         case 200:
             self.sections = reply.iMyEduSections;
             [self.tableView reloadData];
             [self.pcRefreshControl endRefreshing];
+            [self.pcRefreshControl markRefreshSuccessful];
             break;
         case 407:
             [self.myEduService deleteSession];
@@ -123,26 +141,21 @@ static NSString* kMyEduSectionListCell = @"MyEduSectionListCell";
 }
 
 - (void)getCourseDetailsFailedForRequest:(MyEduCourseDetailsRequest *)request {
-    [[MyEduController sharedInstance] removeLoginObserver:self];
     [self error];
 }
 
 
 - (void)error {
     self.pcRefreshControl.type = RefreshControlTypeProblem;
-    self.pcRefreshControl.message = NSLocalizedStringFromTable(@"ConnectionToServerErrorShort", @"PocketCampus", nil);
-    if (!self.sections) {
-        [[[UIAlertView alloc] initWithTitle:NSLocalizedStringFromTable(@"Error", @"PocketCampus", nil) message:NSLocalizedStringFromTable(@"ConnectionToServerError", @"PocketCampus", nil) delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil] show];
-    }
+    self.pcRefreshControl.message = NSLocalizedStringFromTable(@"ServerErrorShort", @"PocketCampus", nil);
+    [PCUtils showServerErrorAlert];
     [self.pcRefreshControl hideInTimeInterval:2.0];
 }
 
 - (void)serviceConnectionToServerTimedOut {
     self.pcRefreshControl.type = RefreshControlTypeProblem;
     self.pcRefreshControl.message = NSLocalizedStringFromTable(@"ConnectionToServerTimedOutShort", @"PocketCampus", nil);
-    if (!self.sections) {
-        [[[UIAlertView alloc] initWithTitle:NSLocalizedStringFromTable(@"Error", @"PocketCampus", nil) message:NSLocalizedStringFromTable(@"ConnectionToServerTimedOut", @"PocketCampus", nil) delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil] show];
-    }
+    [PCUtils showConnectionToServerTimedOutAlert];
     [self.pcRefreshControl hideInTimeInterval:2.0];
 }
 
@@ -160,7 +173,7 @@ static NSString* kMyEduSectionListCell = @"MyEduSectionListCell";
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if (self.sections && [self.sections count] == 0) {
-        if (indexPath.row == 2) {
+        if (indexPath.row == 1) {
             return [[PCCenterMessageCell alloc] initWithMessage:NSLocalizedStringFromTable(@"NoSection", @"MyEduPlugin", nil)];
         } else {
             return [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:nil];
@@ -187,7 +200,7 @@ static NSString* kMyEduSectionListCell = @"MyEduSectionListCell";
 {
     // Return the number of rows in the section.
     if ([self.sections count] == 0) {
-        return 3; //first empty cell, second cell says no content
+        return 2; //first empty cell, second cell says no content
     }
     return [self.sections count];
 }

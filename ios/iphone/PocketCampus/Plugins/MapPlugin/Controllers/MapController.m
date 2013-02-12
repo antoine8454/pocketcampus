@@ -12,6 +12,12 @@
 
 static MapController* instance __weak = nil;
 
+@interface MapController ()
+
+@property (nonatomic, strong) MapViewController* mapViewController;
+
+@end
+
 @implementation MapController
 
 - (id)init
@@ -22,8 +28,8 @@ static MapController* instance __weak = nil;
         }
         self = [super init];
         if (self) {
-            MapViewController* mapViewController = [[MapViewController alloc] init];
-            PluginNavigationController* navController = [[PluginNavigationController alloc] initWithRootViewController:mapViewController];
+            self.mapViewController = [[MapViewController alloc] init];
+            PluginNavigationController* navController = [[PluginNavigationController alloc] initWithRootViewController:self.mapViewController];
             navController.pluginIdentifier = [[self class] identifierName];
             self.mainNavigationController = navController;
             instance = self;
@@ -32,7 +38,7 @@ static MapController* instance __weak = nil;
     }
 }
 
-+ (id)sharedInstance {
++ (id)sharedInstanceToRetain {
     @synchronized (self) {
         if (instance) {
             return instance;
@@ -53,6 +59,8 @@ static MapController* instance __weak = nil;
     return [[MapViewController alloc] initWithInitialQuery:query pinTextLabel:pinLabelText];
 }
 
+#pragma mark - PluginControllerProtocol
+
 + (NSString*)localizedName {
     return NSLocalizedStringFromTable(@"PluginName", @"MapPlugin", @"");
 }
@@ -60,6 +68,8 @@ static MapController* instance __weak = nil;
 + (NSString*)identifierName {
     return @"Map";
 }
+
+#pragma mark - dealloc
 
 - (void)dealloc
 {

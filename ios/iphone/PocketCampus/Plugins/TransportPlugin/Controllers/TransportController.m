@@ -37,7 +37,7 @@ static NSMutableDictionary* settings = nil;
     }
 }
 
-+ (id)sharedInstance {
++ (id)sharedInstanceToRetain {
     @synchronized (self) {
         if (instance) {
             return instance;
@@ -56,12 +56,6 @@ static NSMutableDictionary* settings = nil;
 
 + (NSString*)identifierName {
     return @"Transport";
-}
-
-- (void)refresh {
-    if (self.mainNavigationController.visibleViewController == self.mainNavigationController.viewControllers[0]) {
-        [(NextDeparturesListViewController*)(self.mainNavigationController.viewControllers[0]) refresh];
-    }
 }
 
 + (BOOL)saveObjectSetting:(NSObject<NSCoding>*)val forKey:(NSString*)settingKey {

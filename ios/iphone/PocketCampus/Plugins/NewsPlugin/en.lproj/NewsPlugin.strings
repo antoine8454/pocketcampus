@@ -7,6 +7,10 @@
 */
 
 "PluginName" = "News";
-"CenterLabelLoadingText" = "Loading news";
+"LoadingNews" = "Loading news";
+"TodaySectionTitle" = "Today";
+"WeekSectionTitle" = "Less than a week";
+"MonthSectionTitle" = "Less than a month";
+"OlderSectionTitle" = "Older";
 "OpenInSafari" = "Open in Safari";
 "ClickLinkLeaveApplicationExplanation" = "You will leave the application. Continue ?";

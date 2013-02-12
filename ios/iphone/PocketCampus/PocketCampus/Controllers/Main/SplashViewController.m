@@ -10,6 +10,8 @@
 
 #import "PCUtils.h"
 
+#import "PCValues.h"
+
 #import <QuartzCore/QuartzCore.h>
 
 @interface SplashViewController ()
@@ -34,7 +36,8 @@
     self.view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 1, 1)]; //any non-null size. AutoresizingMask will stretch to full screen size
     self.view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     self.view.autoresizesSubviews = YES;
-    self.view.layer.cornerRadius = 5;
+
+    self.view.layer.cornerRadius = [PCValues defaultCornerRadius];
     self.view.layer.masksToBounds = YES;
     
     self.splashViewImage = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"PocketCampusDrawing"]];
@@ -55,14 +58,17 @@
 }
 
 - (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
     self.splashViewImage.center = self.view.center;
 }
 
 - (void)willMoveToRightWithDuration:(NSTimeInterval)duration hideDrawingOnIdiomPhone:(BOOL)hideDrawingOnIdiomPhone {
     if ([PCUtils isIdiomPad]) { //adapt drawing's position
-        [UIView animateWithDuration:duration animations:^{
+        
+        [UIView animateWithDuration:duration delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
             self.view.frame = CGRectMake(0, 0, self.view.frame.size.width - self.rightHiddenOffset, self.view.frame.size.height);
-        }];
+        } completion:NULL];
+        
     } else { //hide drowing
         if (hideDrawingOnIdiomPhone) {
             self.splashViewImage.alpha = 0.0;

@@ -22,6 +22,12 @@
 
 #import "MyEduSplashDetailViewController.h"
 
+#import "PushNotifController.h"
+
+#import "GANTracker.h"
+
+static const NSTimeInterval kRefreshValiditySeconds = 604800.0; //1 week
+
 @interface MyEduCourseListViewController ()
 
 @property (nonatomic, strong) MyEduService* myEduService;
@@ -42,7 +48,7 @@ static NSString* kMyEduCourseListCell = @"MyEduCourseListCell";
         // Custom initialization
         self.myEduService = [MyEduService sharedInstanceToRetain];
         self.subscribedCourses = [self.myEduService getFromCacheSubscribedCoursesListForRequest:[self.myEduService createMyEduRequest]].iSubscribedCourses;
-        self.pcRefreshControl = [[PCRefreshControl alloc] initWithTableViewController:self];
+        self.pcRefreshControl = [[PCRefreshControl alloc] initWithTableViewController:self pluginName:@"myedu"  refreshedDataIdentifier:@"myEduSubscribedCourseList"];
         [self.pcRefreshControl setTarget:self selector:@selector(refresh)];
     }
     return self;
@@ -51,14 +57,16 @@ static NSString* kMyEduCourseListCell = @"MyEduCourseListCell";
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    [[GANTracker sharedTracker] trackPageview:@"/v3r1/myedu" withError:NULL];
     /*UIView* backgroundView = [[UIView alloc] init];
     backgroundView.backgroundColor = [UIColor whiteColor];
     self.tableView.backgroundView = backgroundView;
     self.tableView.backgroundColor = [UIColor clearColor];*/
 }
 
-- (void)viewDidAppear:(BOOL)animated {
-    if (!self.subscribedCourses) {
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    if (!self.subscribedCourses || [self.pcRefreshControl shouldRefreshDataForValidity:kRefreshValiditySeconds]) {
         [self refresh];
     }
 }
@@ -68,6 +76,18 @@ static NSString* kMyEduCourseListCell = @"MyEduCourseListCell";
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
+
+- (NSUInteger)supportedInterfaceOrientations //iOS 6
+{
+    return UIInterfaceOrientationMaskAllButUpsideDown;
+    
+}
+
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation //iOS 5
+{
+    return UIInterfaceOrientationIsLandscape(interfaceOrientation) || (UIInterfaceOrientationPortrait);
+}
+
 
 #pragma mark - refresh control
 
@@ -85,7 +105,7 @@ static NSString* kMyEduCourseListCell = @"MyEduCourseListCell";
         successBlock();
     } else {
         NSLog(@"-> No saved session, loggin in...");
-        [[MyEduController sharedInstance] addLoginObserver:self operationIdentifier:nil successBlock:successBlock userCancelledBlock:^{
+        [[MyEduController sharedInstanceToRetain] addLoginObserver:self successBlock:successBlock userCancelledBlock:^{
             [self.pcRefreshControl endRefreshing];
         } failureBlock:^{
             [self error];
@@ -103,12 +123,12 @@ static NSString* kMyEduCourseListCell = @"MyEduCourseListCell";
 #pragma mark - MyEduServiceDelegate
 
 - (void)getSubscribedCoursesListForRequest:(MyEduRequest *)request didReturn:(MyEduSubscribedCoursesListReply *)reply {
-    [[MyEduController sharedInstance] removeLoginObserver:self];
     switch (reply.iStatus) {
         case 200:
             self.subscribedCourses = reply.iSubscribedCourses;
             [self.tableView reloadData];
             [self.pcRefreshControl endRefreshing];
+            [self.pcRefreshControl markRefreshSuccessful];
             break;
         case 407:
             [self.myEduService deleteSession];
@@ -121,25 +141,20 @@ static NSString* kMyEduCourseListCell = @"MyEduCourseListCell";
 }
 
 - (void)getSubscribedCoursesListFailedForRequest:(MyEduRequest *)request {
-    [[MyEduController sharedInstance] removeLoginObserver:self];
     [self error];
 }
 
 - (void)error {
     self.pcRefreshControl.type = RefreshControlTypeProblem;
-    self.pcRefreshControl.message = NSLocalizedStringFromTable(@"ConnectionToServerErrorShort", @"PocketCampus", nil);
-    if (!self.subscribedCourses) {
-        [[[UIAlertView alloc] initWithTitle:NSLocalizedStringFromTable(@"Error", @"PocketCampus", nil) message:NSLocalizedStringFromTable(@"ConnectionToServerError", @"PocketCampus", nil) delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil] show];
-    }
+    self.pcRefreshControl.message = NSLocalizedStringFromTable(@"ServerErrorShort", @"PocketCampus", nil);
+    [PCUtils showServerErrorAlert];
     [self.pcRefreshControl hideInTimeInterval:2.0];
 }
 
 - (void)serviceConnectionToServerTimedOut {
     self.pcRefreshControl.type = RefreshControlTypeProblem;
     self.pcRefreshControl.message = NSLocalizedStringFromTable(@"ConnectionToServerTimedOutShort", @"PocketCampus", nil);
-    if (!self.subscribedCourses) {
-        [[[UIAlertView alloc] initWithTitle:NSLocalizedStringFromTable(@"Error", @"PocketCampus", nil) message:NSLocalizedStringFromTable(@"ConnectionToServerTimedOut", @"PocketCampus", nil) delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil] show];
-    }
+    [PCUtils showConnectionToServerTimedOutAlert];
     [self.pcRefreshControl hideInTimeInterval:2.0];
 }
 
@@ -156,7 +171,7 @@ static NSString* kMyEduCourseListCell = @"MyEduCourseListCell";
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if (self.subscribedCourses && [self.subscribedCourses count] == 0) {
-        if (indexPath.row == 2) {
+        if (indexPath.row == 1) {
             return [[PCCenterMessageCell alloc] initWithMessage:NSLocalizedStringFromTable(@"NotSubscribedToAnyCourse", @"MyEduPlugin", nil)];
         } else {
             return [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:nil];

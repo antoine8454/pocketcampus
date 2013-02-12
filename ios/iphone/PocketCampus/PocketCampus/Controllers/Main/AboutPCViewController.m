@@ -33,7 +33,7 @@
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view.
-    [[GANTracker sharedTracker] trackPageview:@"/v3r1/dashboard/about" withError:NULL];
+    [[GANTracker sharedTracker] trackPageview:@"/v3r1/dashboard/settings/about" withError:NULL];
 	self.title = NSLocalizedStringFromTable(@"About", @"PocketCampus", nil);
     self.view.backgroundColor = [PCValues backgroundColor1];
     webView.delegate = self;
@@ -84,7 +84,13 @@
 }
 
 - (void)showInfos {
-    UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"PC_CONFIG_TYPE" message:[[PCConfig defaults] objectForKey:PC_CONFIG_TYPE_KEY] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+    BOOL loadedFromBundle = [[PCConfig defaults] boolForKey:PC_CONFIG_LOADED_FROM_BUNDLE_KEY];
+    BOOL loadedFromServer = [[PCConfig defaults] boolForKey:PC_CONFIG_LOADED_FROM_SERVER_KEY];
+    BOOL loadedFromAppSupport = [[PCConfig defaults] boolForKey:PC_DEV_CONFIG_LOADED_FROM_APP_SUPPORT];
+    NSString* serverAddress = [[PCConfig defaults] objectForKey:PC_CONFIG_SERVER_ADDRESS_KEY];
+    
+    NSString* message = [NSString stringWithFormat:@"%@:%d\n%@:%d\n%@:%d\n\nServer address:\n%@", @"Bundle", loadedFromBundle, @"Server", loadedFromServer, @"AppSupport", loadedFromAppSupport, serverAddress];
+    UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"PCConfig state" message:message delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
     [alert show];
     [alert release];
 }
@@ -92,9 +98,42 @@
 /* UIWebViewDelegate delegation */
 
 - (void)webViewDidFinishLoad:(UIWebView *)webView_ {
-    [UIView animateWithDuration:0.2 animations:^{
-        webView.alpha = 1.0;
-    }];
+    [webView sizeToFit];
+    
+    BOOL pad = [PCUtils isIdiomPad];
+    BOOL fourInch = [PCUtils is4inchDevice];
+    BOOL retina = [PCUtils isRetinaDevice];
+    BOOL ios5 = [PCUtils isOSVersionSmallerThan:6.0];
+    BOOL ios6_0 = !ios5 && [PCUtils isOSVersionSmallerThan:6.1];
+    
+    
+    if (pad) {
+        webView.frame = CGRectOffset(webView.frame, 0, -20.0);
+    } else {
+        if (fourInch) {
+            webView.frame = CGRectOffset(webView.frame, 0, -10.0);
+        } else {
+            if (retina) {
+                if (ios5) {
+                    webView.frame = CGRectOffset(webView.frame, 0, +15.0);
+                } else if (ios6_0) {
+                    webView.frame = CGRectOffset(webView.frame, 0, 0.0);
+                } else {
+                    webView.frame = CGRectOffset(webView.frame, 0, +15.0);
+                }
+            } else {
+                if (ios5) {
+                    webView.frame = CGRectOffset(webView.frame, 0, 0.0);
+                } else if (ios6_0) {
+                    webView.frame = CGRectOffset(webView.frame, 0, 0.0);
+                } else {
+                    webView.frame = CGRectOffset(webView.frame, 0, 0.0);
+                }
+            }
+        }
+    }
+    
+    webView.alpha = 1.0;
 }
 
 - (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType {

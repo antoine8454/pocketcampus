@@ -9,6 +9,8 @@
 
 #import "MyEduCourseListViewController.h"
 
+#import "MyEduSplashDetailViewController.h"
+
 #import "ObjectArchiver.h"
 
 #import "AuthenticationController.h"
@@ -25,6 +27,8 @@ static NSString* kDeleteSessionAtInitKey = @"DeleteSessionAtInit";
 @property (nonatomic, strong) MyEduTequilaToken* tequilaToken;
 @property (nonatomic, strong) NSMutableArray* loginObservers; //array of PCLoginObservers (def. in AuthenticationController)
 
+@property (nonatomic, strong) PushNotifController* pushController;
+
 @end
 
 static MyEduController* instance __weak = nil;
@@ -40,25 +44,37 @@ static MyEduController* instance __weak = nil;
         self = [super init];
         if (self) {
             [[self class] deleteSessionIfNecessary];
-            _loginObservers = [NSMutableArray array];
             MyEduCourseListViewController* courseListViewController = [[MyEduCourseListViewController alloc] init];
             courseListViewController.title = NSLocalizedStringFromTable(@"MyCourses", @"MyEduPlugin", nil);
             
             UINavigationController* masterNavigationController = [[UINavigationController alloc] initWithRootViewController:courseListViewController];
-            UIViewController* detailViewController = [[UIViewController alloc] init]; //detail view controller will be set by PluginSplitViewController that will ask to master view controller
+            UIViewController* detailViewController = [[MyEduSplashDetailViewController alloc] init]; //detail view controller will be set by PluginSplitViewController that will ask to master view controller
             
             PluginSplitViewController* splitViewController = [[PluginSplitViewController alloc] initWithMasterViewController:masterNavigationController detailViewController:detailViewController];
             splitViewController.delegate = self;
             
             self.mainSplitViewController = splitViewController;
             self.mainSplitViewController.pluginIdentifier = [[self class] identifierName];
+            
+            /* TEST */
+            /*
+             self.pushController = [PushNotifController sharedInstance];
+            [self.pushController addAuthentifiedUserDeviceRegistrationObserver:self presentationViewControllerForAutentication:courseListViewController successBlock:^{
+                NSLog(@"OK");
+            } failureBlock:^(PushNotifDeviceRegistrationError error) {
+                NSLog(@"Failed");
+            }];
+             */
+            /* */
+            
             instance = self;
+            
         }
         return self;
     }
 }
 
-+ (id)sharedInstance {
++ (id)sharedInstanceToRetain {
     @synchronized (self) {
         if (instance) {
             return instance;
@@ -93,88 +109,34 @@ static MyEduController* instance __weak = nil;
             } else {
                 NSLog(@"-> MyEdu received %@ notification", [AuthenticationService logoutNotificationName]);
                 [[MyEduService sharedInstanceToRetain] deleteSession];
+                [ObjectArchiver deleteAllCachedObjectsForPluginName:@"MyEdu"];
                 [[MainController publicController] requestLeavePlugin:@"MyEdu"];
             }
         }];
         
-        [[PushNotifController sharedInstance] addNotificationObserverWithPluginLowerIdentifier:@"myedu" newNotificationBlock:^(NSString *notificationMessage) {
-            [[MainController publicController] requestPluginToForeground:@"MyEdu"];
-        }];
-        
         initObserversDone = YES;
+        //[NSTimer scheduledTimerWithTimeInterval:3.0 target:self selector:@selector(test) userInfo:nil repeats:NO];
     }
 }
 
+
 #pragma mark - Login observers management
 
-- (void)addLoginObserver:(id)observer operationIdentifier:(NSString*)identifier successBlock:(VoidBlock)successBlock
+- (void)addLoginObserver:(id)observer successBlock:(VoidBlock)successBlock
     userCancelledBlock:(VoidBlock)userCancelledblock failureBlock:(VoidBlock)failureBlock {
     
-    @synchronized(self) {
-        PCLoginObserver* loginObserver = [[PCLoginObserver alloc] init];
-        loginObserver.observer = observer;
-        loginObserver.operationIdentifier = identifier;
-        loginObserver.successBlock = successBlock;
-        loginObserver.userCancelledBlock = userCancelledblock;
-        loginObserver.failureBlock = failureBlock;
-        [self.loginObservers addObject:loginObserver];
-        if(!self.authController) {
-            self.myEduService = [MyEduService sharedInstanceToRetain];
-            self.authController = [AuthenticationController sharedInstance];
-            [self.myEduService getTequilaTokenForMyEduWithDelegate:self];
-        }
+    [super addLoginObserver:observer successBlock:successBlock userCancelledBlock:userCancelledblock failureBlock:failureBlock];
+    if(!super.authenticationStarted) {
+        super.authenticationStarted = YES;
+        self.myEduService = [MyEduService sharedInstanceToRetain];
+        [self.myEduService getTequilaTokenForMyEduWithDelegate:self];
     }
 }
 
 - (void)removeLoginObserver:(id)observer {
-    [self removeLoginObserver:observer operationIdentifier:nil];
-}
-
-- (void)removeLoginObserver:(id)observer operationIdentifier:(NSString*)identifier { //pass nil identifier to remove all from observer
-    @synchronized(self) {
-        for (PCLoginObserver* loginObserver in [self.loginObservers copy]) {
-            if (loginObserver.observer == observer && (!identifier || [loginObserver.operationIdentifier isEqualToString:identifier])) {
-                [self.loginObservers removeObject:loginObserver];
-            }
-        }
-        if ([self.loginObservers count] == 0) {
-            [self.myEduService cancelOperationsForDelegate:self]; //abandon login attempt if no more observer interested
-            self.myEduService = nil;
-            self.authController = nil;
-        }
-    }
-}
-
-- (void)cleanAndNotifySuccessToObservers {
-    self.tequilaToken = nil;
-    self.authController = nil;
-    self.myEduService = nil;
-    @synchronized (self) {
-        for (PCLoginObserver* loginObserver in self.loginObservers) {
-            loginObserver.successBlock();
-        }
-    }
-}
-
-- (void)cleanAndNotifyFailureToObservers {
-    self.tequilaToken = nil;
-    self.authController = nil;
-    self.myEduService = nil;
-    @synchronized (self) {
-        for (PCLoginObserver* loginObserver in self.loginObservers) {
-            loginObserver.failureBlock();
-        }
-    }
-}
-
-- (void)cleanAndNotifyUserCancelledToObservers {
-    self.tequilaToken = nil;
-    self.authController = nil;
-    self.myEduService = nil;
-    @synchronized (self) {
-        for (PCLoginObserver* loginObserver in self.loginObservers) {
-            loginObserver.userCancelledBlock();
-        }
+    [super removeLoginObserver:observer];
+    if ([self.loginObservers count] == 0) {
+        [self.myEduService cancelOperationsForDelegate:self]; //abandon login attempt if no more observer interested
     }
 }
 
@@ -194,6 +156,22 @@ static MyEduController* instance __weak = nil;
 }
 
 - (void)getMyEduSessionForTequilaToken:(MyEduTequilaToken *)tequilaToken didReturn:(MyEduSession *)myEduSession {
+    
+    myEduSession.iMyEduCookie = @"FORBIDDEN"; //TEST
+    
+    if (!myEduSession.iMyEduCookie) {
+        [self cleanAndNotifyFailureToObservers];
+        return;
+    }
+    
+    if ([myEduSession.iMyEduCookie isEqualToString:@"FORBIDDEN"]) {
+        //means user has successfully authentified but is NOT allowed to access MyEdu
+        [self.myEduService deleteSession];
+        [self cleanAndNotifyUserCancelledToObservers];
+        [[[UIAlertView alloc] initWithTitle:NSLocalizedStringFromTable(@"Error", @"PocketCampus", nil) message:NSLocalizedStringFromTable(@"NotAllowedAccessToMyEdu", @"MyEduPlugin", nil) delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil] show];
+        return;
+    }
+    
     [self.myEduService saveSession:myEduSession];
     [self cleanAndNotifySuccessToObservers];
 }
@@ -203,17 +181,7 @@ static MyEduController* instance __weak = nil;
 }
 
 - (void)serviceConnectionToServerTimedOut {
-    self.authController = nil;
-    self.tequilaToken = nil;
-    self.myEduService = nil;
-    @synchronized (self) {
-        for (PCLoginObserver* loginObserver in [self.loginObservers copy]) {
-            if ([loginObserver.observer respondsToSelector:@selector(serviceConnectionToServerTimedOut)]) {
-                [loginObserver.observer serviceConnectionToServerTimedOut];
-            }
-            [self.loginObservers removeObject:loginObserver];
-        }
-    }
+    [super cleanAndNotifyConnectionToServerTimedOutToObservers];
 }
 
 #pragma mark - AuthenticationCallbackDelegate
@@ -249,19 +217,6 @@ static MyEduController* instance __weak = nil;
     return @"MyEdu";
 }
 
-- (void)pluginDidBecomePassive {
-    //TODO
-}
-
-- (void)pluginWillLoseFocus {
-    //TODO
-}
-- (void)pluginDidRegainActive {
-    if ([self.mainSplitViewController.viewControllers[0] respondsToSelector:@selector(refresh)]) {
-        [self.mainSplitViewController.viewControllers[0] refresh];
-    }
-}
-
 #pragma mark - UISplitViewControllerDelegate
 
 - (BOOL)splitViewController:(UISplitViewController *)svc shouldHideViewController:(UIViewController *)vc inOrientation:(UIInterfaceOrientation)orientation {
@@ -275,8 +230,8 @@ static MyEduController* instance __weak = nil;
 
 - (void)dealloc
 {
-    [[self class] deleteSessionIfNecessary];
     [self.myEduService cancelOperationsForDelegate:self];
+    [[self class] deleteSessionIfNecessary];
     @synchronized(self) {
         instance = nil;
     }

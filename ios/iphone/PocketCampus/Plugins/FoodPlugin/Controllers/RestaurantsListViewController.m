@@ -14,9 +14,22 @@
 
 #import "PCUtils.h"
 
+#import "PCValues.h"
+
+#import "PCTableViewSectionHeader.h"
+
+#import "ObjectArchiver.h"
+
 static NSString* kRestaurantCellIdentifier = @"restaurant";
 
-static NSTimeInterval kMealsValidityTimeSeconds = 14400; // 4 hours.
+static NSString* kLastRefreshDateKey = @"lastRefreshDate";
+
+/*
+ * Will refresh if last refresh date is not same date as current OR older than kRefreshValiditySeconds ago
+ * Important to refresh often, otherwise ratings are not updated. Background update of ratings should be
+ * considered in a future update.
+ */
+static const NSTimeInterval kRefreshValiditySeconds = 300.0; //5 min.
 
 @implementation RestaurantsListViewController
 
@@ -27,11 +40,10 @@ static NSTimeInterval kMealsValidityTimeSeconds = 14400; // 4 hours.
     self = [super initWithNibName:@"RestaurantsListView" bundle:nil];
     if (self) {
         foodService = [[FoodService sharedInstanceToRetain] retain];
-        meals = nil;
+        meals = [[foodService getFromCacheMeals] retain];
         restaurants = nil;
         restaurantsAndMeals = nil;
-        shouldRefresh = NO;
-        lastRefreshDate = nil;
+        lastRefreshDate = [(NSDate*)[ObjectArchiver objectForKey:kLastRefreshDateKey andPluginName:@"food" isCache:YES] retain];
     }
     return self;
 }
@@ -41,10 +53,11 @@ static NSTimeInterval kMealsValidityTimeSeconds = 14400; // 4 hours.
     [super viewDidLoad];
 	// Do any additional setup after loading the view.
     [[GANTracker sharedTracker] trackPageview:@"/v3r1/food" withError:NULL];
-    [self refresh];
+    self.view.backgroundColor = [PCValues backgroundColor1];
     UIBarButtonItem* refreshButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh target:self action:@selector(refresh)];
     self.navigationItem.rightBarButtonItem = refreshButton;
     [refreshButton release];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refreshIfNeeded) name:UIApplicationDidBecomeActiveNotification object:[UIApplication sharedApplication]];
     /* TEST */
     /*
     Rating* rating = [[Rating alloc] initWithRatingValue:3.0 numberOfVotes:10 sumOfRatings:20];
@@ -77,29 +90,39 @@ static NSTimeInterval kMealsValidityTimeSeconds = 14400; // 4 hours.
 {
     [super viewWillAppear:animated];
     [tableView deselectRowAtIndexPath:[tableView indexPathForSelectedRow] animated:animated];
+    [self refreshIfNeeded];
 }
 
-- (BOOL)shouldRefresh {
-    if (!lastRefreshDate || shouldRefresh) {
-        return YES;
+- (void)refreshIfNeeded {
+    if (lastRefreshDate && meals) {
+        NSCalendar* calendar = [NSCalendar currentCalendar];
+        
+        unsigned unitFlags = NSYearCalendarUnit | NSMonthCalendarUnit |  NSDayCalendarUnit;
+        NSDateComponents* compLastRefresh = [calendar components:unitFlags fromDate:lastRefreshDate];
+        NSDateComponents* compNow = [calendar components:unitFlags fromDate:[NSDate date]];
+        
+        if ([compLastRefresh day]   == [compNow day] &&
+            [compLastRefresh month] == [compNow month] &&
+            [compLastRefresh year]  == [compNow year] &&
+            abs([lastRefreshDate timeIntervalSinceNow]) < kRefreshValiditySeconds) {
+            [self reloadAndShowTableView];
+            return;
+        }
     }
-    if ([[NSDate date] timeIntervalSinceDate:lastRefreshDate] > kMealsValidityTimeSeconds) {
-        return YES;
+    if (self.navigationController.topViewController != self) {
+        [self.navigationController popToViewController:self animated:NO];
     }
-    return NO;
+    [self refresh];
 }
 
 - (void)refresh {
     [meals release];
     meals = nil;
-    shouldRefresh = NO;
     tableView.hidden = YES;
     [centerActivityIndicator startAnimating];
     centerMessageLabel.text = NSLocalizedStringFromTable(@"CenterLabelLoadingText", @"FoodPlugin", @"Tell the user that the list of restaurants is loading");
     [foodService cancelOperationsForDelegate:self];
     [foodService getMealsWithDelegate:self];
-    [lastRefreshDate release];
-    lastRefreshDate = [[NSDate date] retain];
 }
 
 - (NSUInteger)supportedInterfaceOrientations //iOS 6
@@ -112,7 +135,15 @@ static NSTimeInterval kMealsValidityTimeSeconds = 14400; // 4 hours.
     return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 
-/* FoodServiceDelegate delegation */
+- (void)reloadAndShowTableView {
+    [self populateRestaurantsAndMeals];
+    [centerActivityIndicator stopAnimating];
+    centerMessageLabel.text = @"";
+    tableView.hidden = NO;
+    [PCUtils reloadTableView:tableView withFadingDuration:0.2];
+}
+
+#pragma mark - FoodServiceDelegate
 
 - (void)getMealsDidReturn:(NSArray*)meals_ {
     self.navigationItem.rightBarButtonItem.enabled = YES;
@@ -137,11 +168,10 @@ static NSTimeInterval kMealsValidityTimeSeconds = 14400; // 4 hours.
     }*/
     [meals release];
     meals = [meals_ retain];
-    [self populateRestaurantsAndMeals];
-    [centerActivityIndicator stopAnimating];
-    centerMessageLabel.text = @"";
-    tableView.hidden = NO;
-    [PCUtils reloadTableView:tableView withFadingDuration:0.2];
+    [self reloadAndShowTableView];
+    [lastRefreshDate release];
+    lastRefreshDate = [[NSDate date] retain];
+    [ObjectArchiver saveObject:lastRefreshDate forKey:kLastRefreshDateKey andPluginName:@"food" isCache:YES];
 }
 
 - (void)getMealsNoMeals {
@@ -159,7 +189,6 @@ static NSTimeInterval kMealsValidityTimeSeconds = 14400; // 4 hours.
 }
 
 - (void)serviceConnectionToServerTimedOut {
-    shouldRefresh = YES;
     self.navigationItem.rightBarButtonItem.enabled = YES;
     tableView.hidden = YES;
     [centerActivityIndicator stopAnimating];
@@ -193,7 +222,27 @@ static NSTimeInterval kMealsValidityTimeSeconds = 14400; // 4 hours.
     }] retain];
 }
 
-/* UITableViewDelegate delegation */
+#pragma mark - UITableViewDelegate
+
+- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
+    return [PCValues tableViewSectionHeaderHeight];
+}
+
+- (UIView *) tableView:(UITableView *)tableView_ viewForHeaderInSection:(NSInteger)section
+{
+    NSDateFormatter* dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateStyle:NSDateFormatterMediumStyle];
+    
+    NSString* dateString = [dateFormatter stringFromDate:[NSDate date]]; //now
+    
+    dateString = [NSString stringWithFormat:NSLocalizedStringFromTable(@"MenusForTodayWithFormat", @"FoodPlugin", nil), dateString];
+    
+    [dateFormatter release];
+    
+    PCTableViewSectionHeader* sectionHeader = [[PCTableViewSectionHeader alloc] initWithSectionTitle:dateString tableView:tableView];
+    return [sectionHeader autorelease];
+    
+}
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     Restaurant* restaurant = [restaurants objectAtIndex:indexPath.row];
@@ -202,7 +251,7 @@ static NSTimeInterval kMealsValidityTimeSeconds = 14400; // 4 hours.
     [controller release];
 }
 
-/* UITableViewDataSource */
+#pragma mark - UITableViewDataSource
 
 - (UITableViewCell *)tableView:(UITableView *)tableView_ cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     Restaurant* restaurant = [restaurants objectAtIndex:indexPath.row];
@@ -241,8 +290,11 @@ static NSTimeInterval kMealsValidityTimeSeconds = 14400; // 4 hours.
     return 1;
 }
 
+#pragma mark - dealloc
+
 - (void)dealloc
 {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
     tableView.delegate = nil;
     tableView.dataSource = nil;
     [lastRefreshDate release];

@@ -16,18 +16,30 @@
 
 #import "ObjectArchiver.h"
 
+#import "PCUtils.h"
+
+#import "UIActionSheet+Additions.h"
+
+#import "UIPopoverController+Additions.h"
+
+#import "GANTracker.h"
+
 @interface MyEduModuleVideoViewController ()
 
 @property (nonatomic, strong) MyEduModule* module;
 @property (nonatomic, strong) MyEduService* myEduService;
 @property (nonatomic, strong) MPMoviePlayerController* moviePlayerController;
-@property (nonatomic, strong) NSURLConnection* videoHEADRequestConnection;
+@property (nonatomic, strong) UIWebView* webView;
+@property (nonatomic, strong) ASIHTTPRequest* videoHEADRequest;
 @property (nonatomic, strong) UIPopoverController* downloadPopoverController;
 @property (nonatomic, strong) UIActionSheet* deleteVideoActionSheet;
 @property (nonatomic, strong) NSTimer* downloadingButtonBlinkTimer;
-@property (nonatomic) NSTimeInterval lastPlaybackTime;
+@property (nonatomic) NSTimeInterval playbackTimeAtLoad;
+@property (nonatomic, strong) NSTimer* saveLastPlaybackTimeTimer;
 
 @end
+
+static NSTimeInterval kSaveLastPlaybackTimePeriod = 2.0; //seconds
 
 @implementation MyEduModuleVideoViewController
 
@@ -35,9 +47,9 @@
 {
     self = [super initWithNibName:@"MyEduModuleVideoView" bundle:nil];
     if (self) {
-        _module = module;
-        _myEduService = [MyEduService sharedInstanceToRetain];
-        _lastPlaybackTime = [MyEduService lastPlaybackTimeForVideoForModule:module];
+        self.module = module;
+        self.myEduService = [MyEduService sharedInstanceToRetain];
+        self.playbackTimeAtLoad = [self.myEduService lastPlaybackTimeForVideoForModule:module];
     }
     return self;
 }
@@ -45,6 +57,7 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    [[GANTracker sharedTracker] trackPageview:@"/v3r1/myedu/sections/modules/video" withError:NULL];
 	// Do any additional setup after loading the view.
     //self.view.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"LightGrayTextureBackground"]];
     
@@ -71,6 +84,12 @@
                 self.centerMessageLabel.hidden = NO;
             } else {
                 [self.loadingIndicator startAnimating];
+                self.webView = [[UIWebView alloc] initWithFrame:CGRectMake(1, 1, 450, 338)];
+                self.webView.delegate = self;
+                [self.view addSubview:self.webView];
+                self.webView.center = self.view.center;
+                self.webView.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleLeftMargin;
+                self.webView.hidden = YES;
                 self.webView.layer.masksToBounds = NO;
                 self.webView.layer.shadowOffset = CGSizeMake(0.0, 2.00);
                 self.webView.layer.shadowRadius = 10.0;
@@ -101,12 +120,24 @@
     // Dispose of any resources that can be recreated.
 }
 
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+}
+
+- (void)viewDidDisappear:(BOOL)animated {
+    [super viewDidDisappear:animated];
+    [self.downloadingButtonBlinkTimer invalidate]; //prevent retaining self from NSTimer
+    self.downloadingButtonBlinkTimer = nil;
+}
+
 /* use to follow redirect if needed */
 - (void)startVideoHEADRequest {
-    NSMutableURLRequest *headRequest = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:self.module.iVideoDownloadURL] cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:60.0];
-    headRequest.HTTPMethod = @"HEAD";
-    headRequest.timeoutInterval = 45.0;
-    self.videoHEADRequestConnection = [[NSURLConnection alloc] initWithRequest:headRequest delegate:self];
+    ASIHTTPRequest* headRequest = [ASIHTTPRequest requestWithURL:[NSURL URLWithString:self.module.iVideoDownloadURL]];
+    headRequest.timeOutSeconds = 45.0;
+    headRequest.requestMethod = @"HEAD";
+    headRequest.delegate = self;
+    self.videoHEADRequest = headRequest;
+    [headRequest startAsynchronous];
 }
 
 - (void)initVideoPlayerWithURL:(NSURL*)url {
@@ -128,6 +159,7 @@
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(resizeVideoForNaturalSize) name:MPMovieMediaTypesAvailableNotification object:self.moviePlayerController];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playerLoadStateDidChange) name:MPMoviePlayerLoadStateDidChangeNotification object:self.moviePlayerController];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playerPlaybackStateDidChange) name:MPMoviePlayerPlaybackStateDidChangeNotification object:self.moviePlayerController];
     [self.view addObserver:self forKeyPath:@"frame" options:0 context:nil];
     [self.moviePlayerController prepareToPlay];
 
@@ -137,31 +169,40 @@
     if (!self.moviePlayerController) {
         return;
     }
+    [self.saveLastPlaybackTimeTimer invalidate];
     [self.moviePlayerController pause];
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:nil object:self.moviePlayerController];
-    [self.view removeObserver:self forKeyPath:@"frame"];
+    [self.moviePlayerController stop];
+    self.moviePlayerController.initialPlaybackTime = -1.0; //prevent flickering bug
+    @try {
+        [[NSNotificationCenter defaultCenter] removeObserver:self name:nil object:self.moviePlayerController];
+        [self.view removeObserver:self forKeyPath:@"frame"];
+    }
+    @catch (NSException *exception) {
+        //Might only happen if removeObserver called while no registered observer. Should never happen.
+        //In that case, just ignore it.
+    }
     self.moviePlayerController = nil;
 }
 
 - (void)replaceMoviePlayerURL:(NSURL*)url keepPlaybackTime:(BOOL)keepPlaybackTime {
     [self.loadingIndicator startAnimating];
     NSTimeInterval currentTime = floor(self.moviePlayerController.currentPlaybackTime);
-    [MyEduService saveLastPlaybackTime:currentTime forVideoOfModule:self.module];
-    
+    [self.myEduService saveLastPlaybackTime:currentTime forVideoOfModule:self.module];
+    self.playbackRateButton.hidden = YES;
     [self.moviePlayerController.view removeFromSuperview];
     [self destroyVideoPlayer];
     
     [self initVideoPlayerWithURL:url];
     
     if (keepPlaybackTime) { //player current time will be set when it is loaded, in playerLoadStateDidChange
-        self.lastPlaybackTime = currentTime;
+        self.playbackTimeAtLoad = currentTime;
     } else {
-        self.lastPlaybackTime = 0.0;
+        self.playbackTimeAtLoad = 0.0;
     }
 }
 
 - (void)initDownloadObserver {
-    MyEduModuleVideoViewController* controller __weak = self;
+     MyEduModuleVideoViewController* controller __weak = self;
     
     [self.myEduService addDownloadObserver:self forVideoOfModule:self.module startDownload:NO startBlock:^{
         [controller setDownloadingButtonAnimated:NO];
@@ -174,7 +215,12 @@
         } else {
             [controller replaceMoviePlayerURL:fileLocalURL keepPlaybackTime:YES];
         }
-    } progressBlock:NULL cancelledBlock:^{
+    } progressBlock:^(unsigned long long nbBytesDownloaded, unsigned long long nbBytesToDownload, float ratio) {
+        if (!controller.downloadingButtonBlinkTimer) {
+            [controller setDownloadingButtonAnimated:NO];
+        }
+    }
+    cancelledBlock:^{
         [controller setDownloadButtonAnimated:YES];
         [controller.downloadPopoverController dismissPopoverAnimated:YES];
         controller.downloadPopoverController = nil;
@@ -195,6 +241,7 @@
             [controller setDownloadButtonAnimated:YES];
             controller.deleteVideoActionSheet = nil;
         }
+        [controller replaceMoviePlayerURL:[NSURL URLWithString:controller.module.iVideoDownloadURL] keepPlaybackTime:YES];
     }];
 }
 
@@ -232,37 +279,60 @@
         self.downloadPopoverController = [[UIPopoverController alloc] initWithContentViewController:downloadController];
         [self.downloadPopoverController setPopoverContentSize:CGSizeMake(366.0, 96.0) animated:NO];
     }
-    [self.downloadPopoverController presentPopoverFromBarButtonItem:self.navigationItem.rightBarButtonItem permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
-    [self.myEduService downloadVideoOfModule:self.module];
+    
+    [self.downloadPopoverController togglePopoverFromBarButtonItem:self.navigationItem.rightBarButtonItem permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
+    [self.myEduService downloadVideoOfModule:self.module]; //will not do anything if downloading already
 }
          
 - (void)deleteButtonPressed {
     if (!self.deleteVideoActionSheet) {
         self.deleteVideoActionSheet = [[UIActionSheet alloc] initWithTitle:NSLocalizedStringFromTable(@"DeleteDownloadedVideoExplanation", @"MyEduPlugin", nil) delegate:self cancelButtonTitle:nil destructiveButtonTitle:NSLocalizedStringFromTable(@"Delete", @"PocketCampus", nil) otherButtonTitles:nil];
     }
-    [self.deleteVideoActionSheet showFromBarButtonItem:self.navigationItem.rightBarButtonItem animated:YES];
+    [self.deleteVideoActionSheet toggleFromBarButtonItem:self.navigationItem.rightBarButtonItem animated:YES];
 }
 
-#pragma mark NSURLConnectionDelegate
+- (IBAction)playbackRateButtonPressed {
+    double curr = (double)self.moviePlayerController.currentPlaybackRate;
+    if ([PCUtils double:curr isEqualToDouble:1.0 epsilon:0.1]) {
+        self.moviePlayerController.currentPlaybackRate = 1.2;
+        [self.playbackRateButton setImage:[UIImage imageNamed:@"MyEduMovieSpeed1_2X"] forState:UIControlStateNormal];
+    } else if ([PCUtils double:curr isEqualToDouble:1.2 epsilon:0.1]) {
+        self.moviePlayerController.currentPlaybackRate = 1.5;
+        [self.playbackRateButton setImage:[UIImage imageNamed:@"MyEduMovieSpeed1_5X"] forState:UIControlStateNormal];
+    } else if ([PCUtils double:curr isEqualToDouble:1.5 epsilon:0.1]) {
+        self.moviePlayerController.currentPlaybackRate = 0.5;
+        [self.playbackRateButton setImage:[UIImage imageNamed:@"MyEduMovieSpeed0_5X"] forState:UIControlStateNormal];
+    } else if ([PCUtils double:curr isEqualToDouble:0.5 epsilon:0.1]) {
+        self.moviePlayerController.currentPlaybackRate = 1.0;
+        [self.playbackRateButton setImage:[UIImage imageNamed:@"MyEduMovieSpeed1X"] forState:UIControlStateNormal];
+    } else if ([PCUtils double:curr isEqualToDouble:0.0 epsilon:0.1]) {
+        //movie is paused, do not change anything
+    } else {
+        //unsupported, should not happen
+    }
+}
 
-- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response {
-    [self initVideoPlayerWithURL:response.URL];
+#pragma mark - NSURLConnectionDelegate
+
+- (void)requestRedirected:(ASIHTTPRequest *)request {
+    [self initVideoPlayerWithURL:request.url];
     [self setDownloadButtonAnimated:YES];
+    /* stop request, no need to download the file, we just wanted the redirection URL */
+    [self.videoHEADRequest cancel];
+    self.videoHEADRequest.delegate = nil;
+    self.videoHEADRequest = nil;
 }
 
-- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
+- (void)requestFailed:(ASIHTTPRequest *)request {
     [self.loadingIndicator stopAnimating];
     self.centerMessageLabel.text = NSLocalizedStringFromTable(@"ConnectionToServerTimedOut", @"PocketCampus", nil);
     self.centerMessageLabel.hidden = NO;
     self.webView.hidden = YES;
-    self.videoHEADRequestConnection = nil; //releasing request
+    self.videoHEADRequest.delegate = nil;
+    self.videoHEADRequest = nil;
 }
 
-- (void)connectionDidFinishDownloading:(NSURLConnection *)connection destinationURL:(NSURL *)destinationURL {
-    self.videoHEADRequestConnection = nil;
-}
-
-#pragma mark MPMoviePlayerController notifications and KVO
+#pragma mark - MPMoviePlayerController notifications and KVO
 
 - (void)resizeVideoForNaturalSize {
     if (self.moviePlayerController.naturalSize.width == 0.0 || self.moviePlayerController.naturalSize.height == 0.0) { //natural size not available yet
@@ -271,9 +341,10 @@
     CGFloat ratio = self.moviePlayerController.naturalSize.width/self.moviePlayerController.naturalSize.height;
     CGFloat width = self.view.frame.size.width-40.0;
     CGFloat height = width/ratio;
-    //NSLog(@"%f, %f", self.moviePlayerController.naturalSize.width, self.moviePlayerController.naturalSize.height);
     self.moviePlayerController.view.bounds = CGRectMake(0, 0, width, height);
     self.moviePlayerController.view.center = self.view.center;
+    
+    self.playbackRateButton.frame = CGRectMake((int)(self.view.center.x-(self.playbackRateButton.frame.size.width/2.0)), (int)(self.moviePlayerController.view.frame.origin.y+height+15.0), self.playbackRateButton.frame.size.width, self.playbackRateButton.frame.size.height); //int cast is so that frame is integer values. Otherwise blurry on non-retina device.
 }
 
 - (void)playerLoadStateDidChange {
@@ -282,8 +353,24 @@
         self.centerMessageLabel.hidden = YES;
         [self.view addSubview:self.moviePlayerController.view];
         [self resizeVideoForNaturalSize];
-        self.moviePlayerController.currentPlaybackTime = self.lastPlaybackTime;
+        self.playbackRateButton.hidden = NO;
+        self.moviePlayerController.currentPlaybackTime = self.playbackTimeAtLoad;
     }
+}
+
+- (void)playerPlaybackStateDidChange {
+    if (self.moviePlayerController.playbackState == MPMoviePlaybackStatePlaying) {
+        [self saveLastPlaybackTime];
+        if (!self.saveLastPlaybackTimeTimer) {
+            self.saveLastPlaybackTimeTimer = [NSTimer scheduledTimerWithTimeInterval:kSaveLastPlaybackTimePeriod target:self selector:@selector(saveLastPlaybackTime) userInfo:nil repeats:YES];
+        }
+    } else {
+        [self.saveLastPlaybackTimeTimer invalidate];
+    }
+}
+
+- (void)saveLastPlaybackTime {
+    [self.myEduService saveLastPlaybackTime:floor(self.moviePlayerController.currentPlaybackTime) forVideoOfModule:self.module];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
@@ -298,7 +385,7 @@
 - (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
     if (actionSheet == self.deleteVideoActionSheet && buttonIndex == 0) { //delete pressed
         [self.myEduService removeDownloadedVideoOfModule:self.module];
-        [self replaceMoviePlayerURL:[NSURL URLWithString:self.module.iVideoDownloadURL] keepPlaybackTime:YES];
+        self.deleteVideoActionSheet = nil;
     }
 }
 
@@ -323,10 +410,10 @@
 
 - (void)dealloc
 {
-    [self.videoHEADRequestConnection cancel];
-    [MyEduService saveLastPlaybackTime:floor(self.moviePlayerController.currentPlaybackTime) forVideoOfModule:self.module];
-    [self destroyVideoPlayer];
     [self.myEduService removeDownloadObserver:self forVideoModule:self.module];
+    [self.videoHEADRequest cancel];
+    self.videoHEADRequest.delegate = nil;
+    [self destroyVideoPlayer];
     self.webView.delegate = nil;
     [self.webView stopLoading];
 }
