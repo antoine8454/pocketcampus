@@ -16,14 +16,6 @@
 
 #import "GANTracker.h"
 
-#import "MyEduServiceTests.h"
-
-#import "PushNotifControllerTests.h"
-
-#import "EventsServiceTests.h"
-
-#import "PCURLSchemeHandler.h"
-
 static id test __strong __unused = nil;
 
 @interface AppDelegate ()
@@ -70,26 +62,6 @@ static id test __strong __unused = nil;
     self.mainController = [[MainController alloc] initWithWindow:self.window];
     
     
-    /* TESTS */
-    
-    //test = [[PushNotifControllerTests alloc] init];
-    //[test testRegistrationAuthenticated];
-
-    
-    //[[[PocketCampusLogicTests alloc] init] testAll];
-    
-    //[[[DirectoryServiceTests alloc] init] tempTest];
-    
-    //[[[MapServiceTests alloc] init] tempTest];
-    
-    //[[[MyEduServiceTests alloc] init] tempTest];
-    
-    //test = [[EventsServiceTests alloc] init];
-    
-    //[test tmpTest];
-    
-    /* END OF TESTS */
-    
     [self.window makeKeyAndVisible];
     
     /* App might have been opened by notification touch */
@@ -97,9 +69,6 @@ static id test __strong __unused = nil;
     if (userInfo) {
         [self application:[UIApplication sharedApplication] didReceiveRemoteNotification:userInfo];
     }
-    
-    //test
-    //[self application:[UIApplication sharedApplication] didReceiveRemoteNotification:[NSDictionary dictionaryWithObject:@"myedu" forKey:@"pluginName"]];
 
     return YES;
 }
