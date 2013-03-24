@@ -157,8 +157,6 @@ static MyEduController* instance __weak = nil;
 
 - (void)getMyEduSessionForTequilaToken:(MyEduTequilaToken *)tequilaToken didReturn:(MyEduSession *)myEduSession {
     
-    myEduSession.iMyEduCookie = @"FORBIDDEN"; //TEST
-    
     if (!myEduSession.iMyEduCookie) {
         [self cleanAndNotifyFailureToObservers];
         return;
@@ -204,10 +202,6 @@ static MyEduController* instance __weak = nil;
 }
 
 #pragma mark - PluginControllerProtocol
-
-- (void)refresh {
-    //TODO: refresh infos displayed by plugin if necessary
-}
 
 + (NSString*)localizedName {
     return NSLocalizedStringFromTable(@"PluginName", @"MyEduPlugin", @"");

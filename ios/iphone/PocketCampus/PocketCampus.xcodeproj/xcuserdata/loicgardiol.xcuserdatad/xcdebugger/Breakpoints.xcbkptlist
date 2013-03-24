@@ -60,11 +60,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "PocketCampus/Model/Common/Service.m"
-         timestampString = "374601997.635693"
+         timestampString = "384380025.57643"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "644"
-         endingLineNumber = "644"
+         startingLineNumber = "646"
+         endingLineNumber = "646"
          landmarkName = "-main"
          landmarkType = "5">
       </FileBreakpoint>
@@ -86,11 +86,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "PocketCampus/Model/Common/Service.m"
-         timestampString = "374601997.635693"
+         timestampString = "384380025.57643"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "724"
-         endingLineNumber = "724"
+         startingLineNumber = "726"
+         endingLineNumber = "726"
          landmarkName = "-addDoubleArgument:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -99,11 +99,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "PocketCampus/Model/Common/Service.m"
-         timestampString = "374601997.635693"
+         timestampString = "384380025.57643"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "790"
-         endingLineNumber = "790"
+         startingLineNumber = "792"
+         endingLineNumber = "792"
          landmarkName = "+wrapArgumentChar:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -164,11 +164,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "PocketCampus/Model/Common/Service.m"
-         timestampString = "374601997.635693"
+         timestampString = "384380025.57643"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "598"
-         endingLineNumber = "598"
+         startingLineNumber = "600"
+         endingLineNumber = "600"
          landmarkName = "-main"
          landmarkType = "5">
       </FileBreakpoint>
@@ -268,11 +268,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "Yes"
          filePath = "PocketCampus/Model/Common/Service.m"
-         timestampString = "374603518.285906"
+         timestampString = "384380025.57643"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "990"
-         endingLineNumber = "990"
+         startingLineNumber = "992"
+         endingLineNumber = "992"
          landmarkName = "-dealloc"
          landmarkType = "5">
          <Actions>
@@ -290,13 +290,13 @@
          ignoreCount = "0"
          continueAfterRunningActions = "Yes"
          filePath = "Plugins/DirectoryPlugin/Controllers/DirectorySearchViewController.m"
-         timestampString = "381714133.45"
+         timestampString = "384287236.853066"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "187"
-         endingLineNumber = "187"
-         landmarkName = "-startAutocompleteRequest"
-         landmarkType = "5">
+         startingLineNumber = "189"
+         endingLineNumber = "189"
+         landmarkName = "@implementation DirectorySearchViewController"
+         landmarkType = "3">
          <Actions>
             <BreakpointActionProxy
                ActionType = "Xcode.BreakpointAction.Log">
@@ -312,13 +312,13 @@
          ignoreCount = "0"
          continueAfterRunningActions = "Yes"
          filePath = "Plugins/DirectoryPlugin/Controllers/DirectorySearchViewController.m"
-         timestampString = "381714133.45"
+         timestampString = "384287236.853066"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "196"
-         endingLineNumber = "196"
-         landmarkName = "-startSearchRequest"
-         landmarkType = "5">
+         startingLineNumber = "198"
+         endingLineNumber = "198"
+         landmarkName = "@implementation DirectorySearchViewController"
+         landmarkType = "3">
          <Actions>
             <BreakpointActionProxy
                ActionType = "Xcode.BreakpointAction.Log">
@@ -334,11 +334,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "Yes"
          filePath = "Plugins/DirectoryPlugin/Controllers/DirectorySearchViewController.m"
-         timestampString = "381714133.45"
+         timestampString = "384287236.853066"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "277"
-         endingLineNumber = "277"
+         startingLineNumber = "279"
+         endingLineNumber = "279"
          landmarkName = "-autocompleteFor:didReturn:"
          landmarkType = "5">
          <Actions>
@@ -356,11 +356,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "Yes"
          filePath = "Plugins/DirectoryPlugin/Controllers/DirectorySearchViewController.m"
-         timestampString = "381714156.61678"
+         timestampString = "384287236.853066"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "209"
-         endingLineNumber = "209"
+         startingLineNumber = "211"
+         endingLineNumber = "211"
          landmarkName = "-searchBar:textDidChange:"
          landmarkType = "5">
          <Actions>
@@ -912,11 +912,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "Yes"
          filePath = "PocketCampus/Model/Common/Service.m"
-         timestampString = "374601997.635693"
+         timestampString = "384380025.57643"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "399"
-         endingLineNumber = "399"
+         startingLineNumber = "401"
+         endingLineNumber = "401"
          landmarkName = "-main"
          landmarkType = "5">
          <Actions>
@@ -1198,11 +1198,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "Yes"
          filePath = "Plugins/MapPlugin/Controllers/MapViewController.m"
-         timestampString = "381689185.438306"
+         timestampString = "382441265.464846"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1366"
-         endingLineNumber = "1366">
+         startingLineNumber = "1379"
+         endingLineNumber = "1379">
          <Actions>
             <BreakpointActionProxy
                ActionType = "Xcode.BreakpointAction.DebuggerCommand">
@@ -1217,11 +1217,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "Yes"
          filePath = "Plugins/MapPlugin/Controllers/MapViewController.m"
-         timestampString = "381689185.438306"
+         timestampString = "382441265.464846"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1370"
-         endingLineNumber = "1370">
+         startingLineNumber = "1383"
+         endingLineNumber = "1383">
          <Actions>
             <BreakpointActionProxy
                ActionType = "Xcode.BreakpointAction.Log">
@@ -1297,22 +1297,22 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Plugins/MapPlugin/Controllers/MapViewController.m"
-         timestampString = "381689185.438306"
+         timestampString = "382441265.464846"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "846"
-         endingLineNumber = "846">
+         startingLineNumber = "859"
+         endingLineNumber = "859">
       </FileBreakpoint>
       <FileBreakpoint
          shouldBeEnabled = "No"
          ignoreCount = "0"
          continueAfterRunningActions = "Yes"
          filePath = "Plugins/MapPlugin/Controllers/MapViewController.m"
-         timestampString = "381689185.438306"
+         timestampString = "382441265.464846"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1310"
-         endingLineNumber = "1310">
+         startingLineNumber = "1323"
+         endingLineNumber = "1323">
          <Actions>
             <BreakpointActionProxy
                ActionType = "Xcode.BreakpointAction.Log">
@@ -1328,11 +1328,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Plugins/MapPlugin/Controllers/MapViewController.m"
-         timestampString = "381689185.438306"
+         timestampString = "382441265.464846"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1399"
-         endingLineNumber = "1399">
+         startingLineNumber = "1412"
+         endingLineNumber = "1412">
       </FileBreakpoint>
       <FileBreakpoint
          shouldBeEnabled = "No"
@@ -1361,11 +1361,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Plugins/MapPlugin/Controllers/MapViewController.m"
-         timestampString = "381689185.438306"
+         timestampString = "382441265.464846"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1492"
-         endingLineNumber = "1492">
+         startingLineNumber = "1505"
+         endingLineNumber = "1505">
       </FileBreakpoint>
       <FileBreakpoint
          shouldBeEnabled = "No"
@@ -1407,11 +1407,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "Yes"
          filePath = "Plugins/MapPlugin/Controllers/MapViewController.m"
-         timestampString = "381689185.438306"
+         timestampString = "382441265.464846"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1426"
-         endingLineNumber = "1426">
+         startingLineNumber = "1439"
+         endingLineNumber = "1439">
          <Actions>
             <BreakpointActionProxy
                ActionType = "Xcode.BreakpointAction.DebuggerCommand">
@@ -1426,11 +1426,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "Yes"
          filePath = "Plugins/MapPlugin/Controllers/MapViewController.m"
-         timestampString = "381689185.438306"
+         timestampString = "382441265.464846"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1253"
-         endingLineNumber = "1253">
+         startingLineNumber = "1266"
+         endingLineNumber = "1266">
          <Actions>
             <BreakpointActionProxy
                ActionType = "Xcode.BreakpointAction.Log">
@@ -1446,11 +1446,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "Yes"
          filePath = "Plugins/MapPlugin/Controllers/MapViewController.m"
-         timestampString = "381689185.438306"
+         timestampString = "382441265.464846"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1259"
-         endingLineNumber = "1259">
+         startingLineNumber = "1272"
+         endingLineNumber = "1272">
          <Actions>
             <BreakpointActionProxy
                ActionType = "Xcode.BreakpointAction.Log">
@@ -1488,11 +1488,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "Yes"
          filePath = "PocketCampus/Model/Common/Service.m"
-         timestampString = "374601997.635693"
+         timestampString = "384380025.57643"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "395"
-         endingLineNumber = "395"
+         startingLineNumber = "397"
+         endingLineNumber = "397"
          landmarkName = "-main"
          landmarkType = "5">
          <Actions>
@@ -1720,11 +1720,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "PocketCampus/Controllers/Main/MainMenuViewController.m"
-         timestampString = "381595856.056126"
+         timestampString = "383315209.619718"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "280"
-         endingLineNumber = "280"
+         startingLineNumber = "284"
+         endingLineNumber = "284"
          landmarkName = "-tableView:cellForRowAtIndexPath:"
          landmarkType = "5">
          <Actions>
@@ -1852,11 +1852,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "Yes"
          filePath = "PocketCampus/AppDelegate/AppDelegate.m"
-         timestampString = "381495009.156229"
+         timestampString = "385592641.754031"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "127"
-         endingLineNumber = "127"
+         startingLineNumber = "149"
+         endingLineNumber = "149"
          landmarkName = "-application:supportedInterfaceOrientationsForWindow:"
          landmarkType = "5">
          <Actions>
@@ -1915,11 +1915,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "Yes"
          filePath = "PocketCampus/Views/Common/PCRefreshControl.m"
-         timestampString = "378065231.031025"
+         timestampString = "383771173.619738"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "346"
-         endingLineNumber = "346"
+         startingLineNumber = "349"
+         endingLineNumber = "349"
          landmarkName = "-_hide"
          landmarkType = "5">
          <Actions>
@@ -1959,11 +1959,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "PocketCampus/Views/Common/PCRefreshControl.m"
-         timestampString = "378065231.031025"
+         timestampString = "383771173.619738"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "372"
-         endingLineNumber = "372"
+         startingLineNumber = "375"
+         endingLineNumber = "375"
          landmarkName = "-pullToRefreshController:refreshableInsetForDirection:"
          landmarkType = "5">
          <Actions>
@@ -1981,11 +1981,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "Yes"
          filePath = "PocketCampus/Views/Common/PCRefreshControl.m"
-         timestampString = "378065231.031025"
+         timestampString = "383771173.619738"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "376"
-         endingLineNumber = "376"
+         startingLineNumber = "379"
+         endingLineNumber = "379"
          landmarkName = "-pullToRefreshController:refreshingInsetForDirection:"
          landmarkType = "5">
          <Actions>
@@ -2003,11 +2003,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "Yes"
          filePath = "PocketCampus/Views/Common/PCRefreshControl.m"
-         timestampString = "378065231.031025"
+         timestampString = "383771173.619738"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "380"
-         endingLineNumber = "380"
+         startingLineNumber = "383"
+         endingLineNumber = "383"
          landmarkName = "-pullToRefreshController:canEngageRefreshDirection:"
          landmarkType = "5">
          <Actions>
@@ -2025,11 +2025,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "Yes"
          filePath = "PocketCampus/Views/Common/PCRefreshControl.m"
-         timestampString = "378065231.031025"
+         timestampString = "383771173.619738"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "393"
-         endingLineNumber = "393"
+         startingLineNumber = "396"
+         endingLineNumber = "396"
          landmarkName = "@implementation PCRefreshControl"
          landmarkType = "3">
          <Actions>
@@ -2047,11 +2047,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "Yes"
          filePath = "PocketCampus/Views/Common/PCRefreshControl.m"
-         timestampString = "378065231.031025"
+         timestampString = "383771173.619738"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "399"
-         endingLineNumber = "399"
+         startingLineNumber = "402"
+         endingLineNumber = "402"
          landmarkName = "-pullToRefreshController:didEngageRefreshDirection:"
          landmarkType = "5">
          <Actions>
@@ -2069,11 +2069,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "Yes"
          filePath = "PocketCampus/Views/Common/PCRefreshControl.m"
-         timestampString = "378065231.031025"
+         timestampString = "383771173.619738"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "226"
-         endingLineNumber = "226"
+         startingLineNumber = "229"
+         endingLineNumber = "229"
          landmarkName = "-setType:"
          landmarkType = "5">
          <Actions>
@@ -2148,11 +2148,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "PocketCampus/Model/Common/Service.m"
-         timestampString = "374601997.635693"
+         timestampString = "384380025.57643"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "418"
-         endingLineNumber = "418"
+         startingLineNumber = "420"
+         endingLineNumber = "420"
          landmarkName = "-main"
          landmarkType = "5">
       </FileBreakpoint>
@@ -2241,19 +2241,6 @@
          startingLineNumber = "81"
          endingLineNumber = "81"
          landmarkName = "-authToken:presentationViewController:delegate:"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "PocketCampus/Model/Common/Service.m"
-         timestampString = "374709370.121603"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "304"
-         endingLineNumber = "304"
-         landmarkName = "-checkPrimariesAndScheduleTimeoutTimer"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
@@ -2497,11 +2484,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Plugins/MapPlugin/Controllers/MapController.m"
-         timestampString = "377817281.020119"
+         timestampString = "384025326.790182"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "25"
-         endingLineNumber = "25"
+         startingLineNumber = "27"
+         endingLineNumber = "27"
          landmarkName = "-init"
          landmarkType = "5">
       </FileBreakpoint>
@@ -2510,11 +2497,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Plugins/MapPlugin/Controllers/MapViewController.m"
-         timestampString = "381689185.438306"
+         timestampString = "382441265.464846"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1593"
-         endingLineNumber = "1593">
+         startingLineNumber = "1606"
+         endingLineNumber = "1606">
       </FileBreakpoint>
       <FileBreakpoint
          shouldBeEnabled = "Yes"
@@ -2590,11 +2577,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Plugins/MyEduPlugin/Controllers/MyEduController.m"
-         timestampString = "381674939.675456"
+         timestampString = "383771173.619738"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "197"
-         endingLineNumber = "197"
+         startingLineNumber = "195"
+         endingLineNumber = "195"
          landmarkName = "-userCancelledAuthentication"
          landmarkType = "5">
       </FileBreakpoint>
@@ -2669,11 +2656,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Plugins/MoodlePlugin/Controllers/MoodleResourceViewController.m"
-         timestampString = "381336636.239793"
+         timestampString = "385169433.592638"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "186"
-         endingLineNumber = "186"
+         startingLineNumber = "247"
+         endingLineNumber = "247"
          landmarkName = "-downloadOfMoodleResource:didFinish:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -2682,11 +2669,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "Yes"
          filePath = "Plugins/MoodlePlugin/Controllers/MoodleResourceViewController.m"
-         timestampString = "381336636.239793"
+         timestampString = "385169433.592638"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "201"
-         endingLineNumber = "201"
+         startingLineNumber = "262"
+         endingLineNumber = "262"
          landmarkName = "-downloadFailedForMoodleResource:responseStatusCode:"
          landmarkType = "5">
          <Actions>
@@ -2882,19 +2869,6 @@
          shouldBeEnabled = "No"
          ignoreCount = "0"
          continueAfterRunningActions = "No"
-         filePath = "PocketCampus/Model/Common/Service.m"
-         timestampString = "377220013.595257"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "348"
-         endingLineNumber = "348"
-         landmarkName = "-main"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
          filePath = "Plugins/MoodlePlugin/Controllers/MoodleCourseSectionsViewController.m"
          timestampString = "381591867.299247"
          startingColumnNumber = "9223372036854775807"
@@ -2992,11 +2966,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Plugins/DirectoryPlugin/Controllers/DirectorySearchViewController.m"
-         timestampString = "381714133.45"
+         timestampString = "384287236.853066"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "386"
-         endingLineNumber = "386"
+         startingLineNumber = "388"
+         endingLineNumber = "388"
          landmarkName = "-tableView:didSelectRowAtIndexPath:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -3005,11 +2979,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Plugins/DirectoryPlugin/Controllers/DirectorySearchViewController.m"
-         timestampString = "381714133.45"
+         timestampString = "384287236.853066"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "361"
-         endingLineNumber = "361"
+         startingLineNumber = "363"
+         endingLineNumber = "363"
          landmarkName = "-serviceConnectionToServerTimedOut"
          landmarkType = "5">
       </FileBreakpoint>
@@ -3266,7 +3240,7 @@
          endingColumnNumber = "9223372036854775807"
          startingLineNumber = "180"
          endingLineNumber = "180"
-         landmarkName = "-newsItemContentFailedForId:"
+         landmarkName = "-error"
          landmarkType = "5">
          <Actions>
             <BreakpointActionProxy
@@ -3296,12 +3270,12 @@
          ignoreCount = "0"
          continueAfterRunningActions = "Yes"
          filePath = "PocketCampus/Controllers/Main/MainController.m"
-         timestampString = "381613198.111008"
+         timestampString = "385744068.655937"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "678"
-         endingLineNumber = "678"
-         landmarkName = "-revealController:willRevealRearViewController:"
+         startingLineNumber = "695"
+         endingLineNumber = "695"
+         landmarkName = "-rotateDeviceToPortraitIfNecessary"
          landmarkType = "5">
          <Actions>
             <BreakpointActionProxy
@@ -3362,12 +3336,12 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "PocketCampus/Controllers/Main/MainController.m"
-         timestampString = "381613198.111008"
+         timestampString = "385744068.655937"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "651"
-         endingLineNumber = "651"
-         landmarkName = "-rotateDeviceToPortraitIfNecessary"
+         startingLineNumber = "668"
+         endingLineNumber = "668"
+         landmarkName = "-adaptInitializedNavigationOrSplitViewControllerOfPluginController:"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
@@ -3388,11 +3362,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Plugins/DirectoryPlugin/Controllers/DirectorySearchViewController.m"
-         timestampString = "381714133.45"
+         timestampString = "384287236.853066"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "516"
-         endingLineNumber = "516"
+         startingLineNumber = "515"
+         endingLineNumber = "515"
          landmarkName = "-unknownPersonViewController:shouldPerformDefaultActionForPerson:property:identifier:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -3554,11 +3528,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "PocketCampus/Controllers/Main/MainMenuViewController.m"
-         timestampString = "381595856.056126"
+         timestampString = "383315209.619718"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "201"
-         endingLineNumber = "201"
+         startingLineNumber = "205"
+         endingLineNumber = "205"
          landmarkName = "-settingsButton"
          landmarkType = "5">
       </FileBreakpoint>
@@ -3589,12 +3563,12 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "PocketCampus/Controllers/Main/MainController.m"
-         timestampString = "381613198.111008"
+         timestampString = "385744068.655937"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "424"
-         endingLineNumber = "424"
-         landmarkName = "-mainMenuEndedEditing"
+         startingLineNumber = "412"
+         endingLineNumber = "412"
+         landmarkName = "-appDidReceiveMemoryWarning"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
@@ -3724,31 +3698,32 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Plugins/DirectoryPlugin/Controllers/PCUnkownPersonViewController.m"
-         timestampString = "381420943.277038"
+         timestampString = "385171838.130971"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "48"
-         endingLineNumber = "48"
+         startingLineNumber = "99"
+         endingLineNumber = "99"
          landmarkName = "-photoButtonPressed"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
          shouldBeEnabled = "No"
          ignoreCount = "0"
-         continueAfterRunningActions = "No"
+         continueAfterRunningActions = "Yes"
          filePath = "Plugins/DirectoryPlugin/Controllers/PCUnkownPersonViewController.m"
-         timestampString = "381420943.277038"
+         timestampString = "385171838.130971"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "169"
-         endingLineNumber = "169"
+         startingLineNumber = "241"
+         endingLineNumber = "241"
          landmarkName = "-profilePictureFor:didReturn:"
          landmarkType = "5">
          <Actions>
             <BreakpointActionProxy
-               ActionType = "Xcode.BreakpointAction.DebuggerCommand">
+               ActionType = "Xcode.BreakpointAction.Log">
                <ActionContent
-                  consoleCommand = "returned">
+                  message = "returned"
+                  conveyanceType = "0">
                </ActionContent>
             </BreakpointActionProxy>
          </Actions>
@@ -3756,26 +3731,13 @@
       <FileBreakpoint
          shouldBeEnabled = "No"
          ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "Plugins/DirectoryPlugin/Controllers/PCUnkownPersonViewController.m"
-         timestampString = "380064846.723222"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "41"
-         endingLineNumber = "41"
-         landmarkName = "-viewWillAppear:"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
          continueAfterRunningActions = "Yes"
          filePath = "Plugins/MoodlePlugin/Controllers/MoodleResourceViewController.m"
-         timestampString = "381336636.239793"
+         timestampString = "385169433.592638"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "121"
-         endingLineNumber = "121"
+         startingLineNumber = "152"
+         endingLineNumber = "152"
          landmarkName = "-startMoodleResourceDownload"
          landmarkType = "5">
          <Actions>
@@ -3793,11 +3755,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "Yes"
          filePath = "Plugins/MoodlePlugin/Controllers/MoodleResourceViewController.m"
-         timestampString = "381336636.239793"
+         timestampString = "385169433.592638"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "132"
-         endingLineNumber = "132"
+         startingLineNumber = "163"
+         endingLineNumber = "163"
          landmarkName = "-startMoodleResourceDownload"
          landmarkType = "5">
          <Actions>
@@ -3815,11 +3777,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "Yes"
          filePath = "Plugins/MoodlePlugin/Controllers/MoodleResourceViewController.m"
-         timestampString = "381336636.239793"
+         timestampString = "385169433.592638"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "139"
-         endingLineNumber = "139"
+         startingLineNumber = "170"
+         endingLineNumber = "170"
          landmarkName = "-startMoodleResourceDownload"
          landmarkType = "5">
          <Actions>
@@ -3837,12 +3799,12 @@
          ignoreCount = "0"
          continueAfterRunningActions = "Yes"
          filePath = "PocketCampus/Controllers/Main/MainController.m"
-         timestampString = "381613198.111008"
+         timestampString = "385592641.754031"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "378"
-         endingLineNumber = "378"
-         landmarkName = "-setInitDoneYES"
+         startingLineNumber = "385"
+         endingLineNumber = "385"
+         landmarkName = "-revealMenuAfterSplash"
          landmarkType = "5">
          <Actions>
             <BreakpointActionProxy
@@ -3859,11 +3821,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "Yes"
          filePath = "Plugins/DirectoryPlugin/Controllers/DirectorySearchViewController.m"
-         timestampString = "381714133.45"
+         timestampString = "384287236.853066"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "417"
-         endingLineNumber = "417"
+         startingLineNumber = "416"
+         endingLineNumber = "416"
          landmarkName = "-tableView:didSelectRowAtIndexPath:"
          landmarkType = "5">
          <Actions>
@@ -3880,12 +3842,12 @@
          ignoreCount = "0"
          continueAfterRunningActions = "Yes"
          filePath = "PocketCampus/Controllers/Main/MainController.m"
-         timestampString = "381613198.111008"
+         timestampString = "385592641.754031"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "380"
-         endingLineNumber = "380"
-         landmarkName = "-setInitDoneYES"
+         startingLineNumber = "387"
+         endingLineNumber = "387"
+         landmarkName = "-revealMenuAfterSplash"
          landmarkType = "5">
          <Actions>
             <BreakpointActionProxy
@@ -3902,13 +3864,13 @@
          ignoreCount = "0"
          continueAfterRunningActions = "Yes"
          filePath = "PocketCampus/Controllers/Main/MainController.m"
-         timestampString = "381613198.111008"
+         timestampString = "385592641.754031"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "357"
-         endingLineNumber = "357"
-         landmarkName = "-revealMenuAfterSplash"
-         landmarkType = "5">
+         startingLineNumber = "364"
+         endingLineNumber = "364"
+         landmarkName = "@implementation MainController"
+         landmarkType = "3">
          <Actions>
             <BreakpointActionProxy
                ActionType = "Xcode.BreakpointAction.Log">
@@ -3924,13 +3886,13 @@
          ignoreCount = "0"
          continueAfterRunningActions = "Yes"
          filePath = "PocketCampus/Controllers/Main/MainController.m"
-         timestampString = "381613198.111008"
+         timestampString = "385592641.754031"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "363"
-         endingLineNumber = "363"
-         landmarkName = "-revealMenuAfterSplash"
-         landmarkType = "5">
+         startingLineNumber = "370"
+         endingLineNumber = "370"
+         landmarkName = "@implementation MainController"
+         landmarkType = "3">
          <Actions>
             <BreakpointActionProxy
                ActionType = "Xcode.BreakpointAction.Log">
@@ -3946,25 +3908,12 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "PocketCampus/Controllers/Main/MainController.m"
-         timestampString = "381612656.641144"
+         timestampString = "384033799.33606"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "79"
-         endingLineNumber = "79"
+         startingLineNumber = "82"
+         endingLineNumber = "82"
          landmarkName = "-initWithWindow:"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "PocketCampus/Controllers/Main/MainController.m"
-         timestampString = "381613198.111008"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "403"
-         endingLineNumber = "403"
-         landmarkName = "-mainMenuIsReady"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
@@ -4074,11 +4023,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Plugins/DirectoryPlugin/Controllers/PCUnkownPersonViewController.m"
-         timestampString = "381423267.323493"
+         timestampString = "385171838.130971"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "180"
-         endingLineNumber = "180"
+         startingLineNumber = "253"
+         endingLineNumber = "253"
          landmarkName = "-profilePictureFailedFor:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -4087,11 +4036,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Plugins/DirectoryPlugin/Controllers/PCUnkownPersonViewController.m"
-         timestampString = "381423267.323493"
+         timestampString = "385171838.130971"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "186"
-         endingLineNumber = "186"
+         startingLineNumber = "264"
+         endingLineNumber = "264"
          landmarkName = "-serviceConnectionToServerTimedOut"
          landmarkType = "5">
       </FileBreakpoint>
@@ -4100,11 +4049,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "PocketCampus/Controllers/Main/MainController.m"
-         timestampString = "381612656.641144"
+         timestampString = "385592641.754031"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "235"
-         endingLineNumber = "235"
+         startingLineNumber = "242"
+         endingLineNumber = "242"
          landmarkName = "-initPluginsList"
          landmarkType = "5">
       </FileBreakpoint>
@@ -4227,11 +4176,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "PocketCampus/Controllers/Main/MainController.m"
-         timestampString = "381612760.963663"
+         timestampString = "385592641.754031"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "270"
-         endingLineNumber = "270"
+         startingLineNumber = "277"
+         endingLineNumber = "277"
          landmarkName = "-initPluginsList"
          landmarkType = "5">
       </FileBreakpoint>
@@ -4240,7 +4189,7 @@
          ignoreCount = "0"
          continueAfterRunningActions = "Yes"
          filePath = "Plugins/DirectoryPlugin/Controllers/DirectorySearchViewController.m"
-         timestampString = "381714133.45"
+         timestampString = "384287236.853066"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
          startingLineNumber = "398"
@@ -4262,11 +4211,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "Yes"
          filePath = "Plugins/DirectoryPlugin/Controllers/DirectorySearchViewController.m"
-         timestampString = "381714181.546194"
+         timestampString = "384287236.853066"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "205"
-         endingLineNumber = "205"
+         startingLineNumber = "207"
+         endingLineNumber = "207"
          landmarkName = "-searchBar:textDidChange:"
          landmarkType = "5">
          <Actions>
@@ -4282,24 +4231,349 @@
       <FileBreakpoint
          shouldBeEnabled = "No"
          ignoreCount = "0"
-         continueAfterRunningActions = "Yes"
-         filePath = "Plugins/DirectoryPlugin/Controllers/DirectorySearchViewController.m"
-         timestampString = "381714362.349631"
+         continueAfterRunningActions = "No"
+         filePath = "Plugins/MapPlugin/Controllers/MapViewController.m"
+         timestampString = "382441265.464846"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "168"
-         endingLineNumber = "168"
-         landmarkName = "-clearButtonPressed"
+         startingLineNumber = "532"
+         endingLineNumber = "532"
+         landmarkName = "@implementation MapViewController"
+         landmarkType = "3">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "Yes"
+         ignoreCount = "0"
+         continueAfterRunningActions = "Yes"
+         filePath = "Plugins/MapPlugin/Controllers/MapViewController.m"
+         timestampString = "382441265.464846"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "543"
+         endingLineNumber = "543"
+         landmarkName = "-mapView:didSelectAnnotationView:"
          landmarkType = "5">
          <Actions>
             <BreakpointActionProxy
                ActionType = "Xcode.BreakpointAction.Log">
                <ActionContent
-                  message = "clear pressed"
+                  message = "searching dir"
                   conveyanceType = "0">
                </ActionContent>
             </BreakpointActionProxy>
          </Actions>
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "Plugins/MapPlugin/Views/MapItemAnnotation.m"
+         timestampString = "382441702.772525"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "33"
+         endingLineNumber = "33"
+         landmarkName = "-initWithMapItem:"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "Plugins/MapPlugin/Controllers/MapViewController.m"
+         timestampString = "382443119.333079"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "114"
+         endingLineNumber = "114"
+         landmarkName = "-initWithInitialQuery:"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "Plugins/MapPlugin/Controllers/MapViewController.m"
+         timestampString = "382443137.745897"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "125"
+         endingLineNumber = "125"
+         landmarkName = "-initWithInitialQuery:pinTextLabel:"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "Plugins/EventsPlugin/Model/EventsUtils.m"
+         timestampString = "384020160.427019"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "44"
+         endingLineNumber = "44"
+         landmarkName = "+sectionsOfEventItem:forCategories:andTags:"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "Plugins/EventsPlugin/Model/EventsUtils.m"
+         timestampString = "384020160.427019"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "36"
+         endingLineNumber = "36"
+         landmarkName = "+sectionsOfEventItem:forCategories:andTags:"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "Plugins/EventsPlugin/Controllers/EventItemViewController.m"
+         timestampString = "385322249.580546"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "272"
+         endingLineNumber = "272"
+         landmarkName = "-loadWebView"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "Plugins/EventsPlugin/Controllers/EventPoolViewController.m"
+         timestampString = "385752648.984743"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "609"
+         endingLineNumber = "609"
+         landmarkName = "-tableView:cellForRowAtIndexPath:"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "Plugins/EventsPlugin/Model/EventsUtils.m"
+         timestampString = "384018135.076739"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "19"
+         endingLineNumber = "19"
+         landmarkName = "+sectionsOfEventItem:forCategories:andTags:"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "PocketCampus/Misc/PCUtils.m"
+         timestampString = "385747023.311479"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "121"
+         endingLineNumber = "121"
+         landmarkName = "+urlStringParameters:"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "Plugins/EventsPlugin/Model/EventsService.m"
+         timestampString = "385335958.714908"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "71"
+         endingLineNumber = "71"
+         landmarkName = "-lastUserToken"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "Plugins/EventsPlugin/Model/EventsService.m"
+         timestampString = "385335958.714908"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "78"
+         endingLineNumber = "78"
+         landmarkName = "-saveUserToken:"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "PocketCampus/Misc/PCURLSchemeHandler.m"
+         timestampString = "385458692.746676"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "85"
+         endingLineNumber = "85"
+         landmarkName = "-pluginLowerIdentifierIfValidURL:"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "Plugins/DirectoryPlugin/Controllers/PCUnkownPersonViewController.m"
+         timestampString = "385171838.130971"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "218"
+         endingLineNumber = "218"
+         landmarkName = "-setPerson:"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "PocketCampus/Views/Common/PCTableViewWithRemoteThumbnails.m"
+         timestampString = "385372307.981903"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "114"
+         endingLineNumber = "114"
+         landmarkName = "-thumbnailRequestFinished:"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "Plugins/EventsPlugin/Controllers/EventPoolViewController.m"
+         timestampString = "385752648.984743"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "143"
+         endingLineNumber = "143"
+         landmarkName = "-viewWillAppear:"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "Plugins/EventsPlugin/Controllers/EventPoolViewController.m"
+         timestampString = "385752648.984743"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "78"
+         endingLineNumber = "78"
+         landmarkName = "-init"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "PocketCampus/Controllers/Main/MainController.m"
+         timestampString = "385744068.655937"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "538"
+         endingLineNumber = "538"
+         landmarkName = "-setActivePluginWithIdentifier:"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "PocketCampus/Views/Common/PCTableViewWithRemoteThumbnails.m"
+         timestampString = "384470605.326477"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "62"
+         endingLineNumber = "62"
+         landmarkName = "-setThumbnailURL:forCell:atIndexPath:"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "Plugins/EventsPlugin/Controllers/EventPoolViewController.m"
+         timestampString = "385752648.984743"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "411"
+         endingLineNumber = "411"
+         landmarkName = "-imagePickerController:didFinishPickingMediaWithInfo:"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "Plugins/EventsPlugin/Controllers/EventPoolViewController.m"
+         timestampString = "385752648.984743"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "238"
+         endingLineNumber = "238"
+         landmarkName = "-filterButtonPressed"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "Plugins/EventsPlugin/Controllers/EventPoolViewController.m"
+         timestampString = "385752648.984743"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "314"
+         endingLineNumber = "314"
+         landmarkName = "-presentPeriodSelectionActionSheet"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "PocketCampus/Views/Common/UIActionSheet+Additions.m"
+         timestampString = "385745816.198852"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "14"
+         endingLineNumber = "14"
+         landmarkName = "-toggleFromBarButtonItem:animated:"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "Plugins/EventsPlugin/Controllers/EventPoolViewController.m"
+         timestampString = "385752648.984743"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "329"
+         endingLineNumber = "329"
+         landmarkName = "-actionSheet:willDismissWithButtonIndex:"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "Plugins/EventsPlugin/Controllers/EventPoolViewController.m"
+         timestampString = "385752648.984743"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "245"
+         endingLineNumber = "245"
+         landmarkName = "-filterButtonPressed"
+         landmarkType = "5">
       </FileBreakpoint>
    </FileBreakpoints>
    <SymbolicBreakpoints>

@@ -32,11 +32,14 @@
 
 #import "PCConfig.h"
 
+#import "PCURLSchemeHandler.h"
+
 #import <objc/message.h>
 
 @interface MainController ()
 
 @property (nonatomic, weak) UIWindow* window;
+@property (nonatomic, strong) PCURLSchemeHandler* urlSchemeHander;
 @property (nonatomic, strong) MainMenuViewController* mainMenuViewController;
 @property (nonatomic, strong) ZUUIRevealController* revealController;
 @property (nonatomic) CGFloat revealWidth;
@@ -45,6 +48,7 @@
 @property (nonatomic, strong) SplashViewController* splashViewController;
 @property (nonatomic, weak) PluginController<PluginControllerProtocol>* activePluginController;
 @property (nonatomic, strong) NSString* initialActivePluginIdentifier;
+@property (nonatomic, strong) NSURL* pcURLToHandle;
 @property (nonatomic, strong) NSMutableDictionary* pluginsControllers; //key: plugin identifier name, value: PluginController subclass.
 @property (nonatomic) BOOL initDone;
 
@@ -77,6 +81,7 @@ static MainController<MainControllerPublic>* instance = nil;
     self = [super init];
     if (self) {
         self.window = window;
+        self.urlSchemeHander = [[PCURLSchemeHandler alloc] initWithMainController:self];
         self.activePluginController = nil;
         [self initPluginsList];
         self.pluginsControllers = [NSMutableDictionary dictionaryWithCapacity:self.pluginsList.count];
@@ -175,6 +180,17 @@ static MainController<MainControllerPublic>* instance = nil;
     }
     [[NSNotificationCenter defaultCenter] removeObserver:observer name:nil object:self];
     NSLog(@"-> %@ unregistered of PluginStateNotifications", observer);
+}
+
+- (PCURLSchemeHandler*)urlSchemeHandlerSharedInstance {
+    return self.urlSchemeHander;
+}
+
+- (void)handlePocketCampusURL:(NSURL*)url {
+    self.pcURLToHandle = url;
+    if (self.initDone) {
+        //not supported yet
+    }
 }
 
 #pragma mark Private utilities
@@ -383,6 +399,9 @@ static MainController<MainControllerPublic>* instance = nil;
             [self.revealController showFrontViewCompletely:YES];
         }
     }
+    if (self.pcURLToHandle) {
+        //not supported yet
+    }
 }
 
 #pragma mark - Called by AppDelegate
@@ -483,7 +502,7 @@ static MainController<MainControllerPublic>* instance = nil;
         return;
     }
     
-    if (!identifier) { //means swtich to splash view controller
+    if (!identifier) { //means switch to splash view controller
         if (self.activePluginController) {
             [self.pluginsControllers removeObjectForKey:[self.activePluginController.class identifierName]];
         }
@@ -544,6 +563,46 @@ static MainController<MainControllerPublic>* instance = nil;
 
 - (NSString*)pluginControllerClassNameForIdentifier:(NSString*)identifier {
     return [NSString stringWithFormat:@"%@Controller", identifier];
+}
+
+- (PluginController<PluginControllerProtocol>*)pluginControllerForPluginIdentifier:(NSString*)identifier {
+    NSString* lowerCaseIdentifier = [identifier lowercaseString];
+    
+    if (self.activePluginController) {
+        NSString* activePluginControllerLowerCaseIdentifier = [[[self.activePluginController class] identifierName] lowercaseString];
+        if ([lowerCaseIdentifier isEqualToString:activePluginControllerLowerCaseIdentifier]) {
+            return self.activePluginController;
+        }
+    }
+    
+    
+    NSString* identifierName = nil;
+    for (NSString* originalIdentifier in self.pluginsList) {
+        if ([lowerCaseIdentifier isEqualToString:[originalIdentifier lowercaseString]]) {
+            identifierName = originalIdentifier;
+        }
+    }
+    
+    if (!identifierName) {
+        return nil;
+    }
+    
+    PluginController<PluginControllerProtocol>* pluginController = nil;
+    Class pluginClass = NSClassFromString([self pluginControllerClassNameForIdentifier:identifierName]);
+    if (!pluginClass) {
+        return nil;
+    }
+    pluginController = [[pluginClass alloc] init];
+    return pluginController;
+}
+
+- (BOOL)existsPluginWithIdentifier:(NSString*)identifier {
+    for (NSString* originalIdentifier in self.pluginsList) {
+        if ([[identifier lowercaseString] isEqualToString:[originalIdentifier lowercaseString]]) {
+            return YES;
+        }
+    }
+    return NO;
 }
 
 

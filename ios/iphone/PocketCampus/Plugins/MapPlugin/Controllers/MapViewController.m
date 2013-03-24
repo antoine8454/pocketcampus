@@ -676,7 +676,7 @@ static NSString* kMapItemAnnotationIdentifier = @"mapItemAnnotation";
 - (void)serviceConnectionToServerTimedOut {
     [self.navBarLoadingIndicator stopAnimating];
     [self.searchActivityIndicator stopAnimating];
-    self.internetConnectionAlert = [[UIAlertView alloc] initWithTitle:NSLocalizedStringFromTable(@"Error", @"PocketCampus", nil) message:NSLocalizedStringFromTable(@"ConnectionToServerTimedOut", @"PocketCampus", nil) delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+    self.internetConnectionAlert = [[UIAlertView alloc] initWithTitle:NSLocalizedStringFromTable(@"Error", @"PocketCampus", nil) message:NSLocalizedStringFromTable(@"ConnectionToServerTimedOutAlert", @"PocketCampus", nil) delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
     [self.internetConnectionAlert show];
 }
 
@@ -727,7 +727,7 @@ static NSString* kMapItemAnnotationIdentifier = @"mapItemAnnotation";
     if (![button isKindOfClass:[UIButton class]] || !self.personToDisplay) {
         return;
     }
-    PCUnkownPersonViewController* personViewController = [[PCUnkownPersonViewController alloc] initWithDelegate:nil];
+    PCUnkownPersonViewController* personViewController = [[PCUnkownPersonViewController alloc] initWithPerson:self.personToDisplay delegate:nil];
     [personViewController setPerson:self.personToDisplay];
     
     if ([PCUtils isIdiomPad]) {

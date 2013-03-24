@@ -1,0 +1,32 @@
+/* 
+  Localizable.strings
+  PocketCampus
+*/
+
+"PluginName" = "Events";
+"LoadingEventPool" = "Loading elements...";
+"Favorites" = "Favorites";
+"QRCodeErrorMessage" = "This QRCode is not supported or an error occured during the scan. Please try again.";
+"UserNotRegistered" = "Please scan first your own private QR code.";
+"ExchangeContactErrorMessage" = "An error occured during the contact exchange. Please try again.";
+"NoEvent" = "No element";
+"LoadingEventItem" = "Loading...";
+"Date&Time" = "Date & time";
+"Place" = "Location";
+"By" = "By";
+"MoreDetails" = "More details";
+"NoResultPCUnknownViewControllerLoad" = "Impossible to find this person.";
+"Filter" = "Filter";
+"SelectCategory" = "Go to category";
+"Categories" = "Categories";
+"NoCategory" = "No category";
+"PeriodWithFormat" = "Period (%@)";
+"ShowEventsFor..." = "Show upcoming events for the\nfollowing period";
+"Days" = "Days";
+"OneDay" = "1 day";
+"TwoDays" = "2 days";
+"OneMonth" = "1 month";
+"OneWeek" = "1 week";
+"TwoWeeks" = "2 weeks";
+"SixMonths" = "6 months";
+"OneYear" = "1 year";
